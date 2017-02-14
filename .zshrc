@@ -5,7 +5,10 @@ ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="robbyrussell"
+#ZSH_THEME="robbyrussell"
+ZSH_THEME="agnoster"
+DEFAULT_USER='fjzhou'
+
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -69,7 +72,7 @@ bindkey "\eOF" end-of-line
 bindkey "\e[H" beginning-of-line
 bindkey "\e[F" end-of-line
 
-PROMPT='%{$fg[red]%}➜ %{$fg[green]%}%p%{$fg[cyan]%}%d %{$fg[blue]%}$(git_prompt_info)%{$fg[blue]%}% %{$reset_color%}>'
+#PROMPT='%{$fg[red]%}➜ %{$fg[green]%}%p%{$fg[cyan]%}%d %{$fg[blue]%}$(git_prompt_info)%{$fg[blue]%}% %{$reset_color%}>'
 
 alias javac="javac -J-Duser.country=US"
 
