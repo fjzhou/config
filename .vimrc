@@ -51,11 +51,14 @@ if has("gui_win32")
 endif
 
 " GUI use solarized
-if has("gui_running")
+let g:solarized_termcolors=256
+if has("gui_running") && !has("gui_macvim")
     set background=light
     colorscheme solarized
 else
-    color molokai
+    "color molokai
+    colorscheme solarized
+    set background=dark
 endif
 
 " statusline
