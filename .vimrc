@@ -7,6 +7,7 @@ syntax on
 filetype plugin indent on
 
 " Important
+set encoding=utf-8
 set fileencodings=utf-8,gb18030,utf-16,big5
 set nobackup
 set nowrap
@@ -107,4 +108,8 @@ let g:user_emmet_settings = {
 \  },
 \}
 
-
+"Airline
+let g:airline_skip_empty_sections=1
+let g:airline#extensions#tabline#enabled = 1
+set t_Co=256
+let g:airline_powerline_fonts = 1  
