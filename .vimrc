@@ -20,6 +20,12 @@ set directory=.,$TEMP
 set undodir=~/.undodir
 set fileformats=unix,dos
 
+" Menu
+set langmenu=zh_CN.UTF-8
+language message zh_CN.UTF-8
+source $VIMRUNTIME/delmenu.vim  
+source $VIMRUNTIME/menu.vim  
+language messages zh_CN.utf-8
 
 " Appearance
 set autoindent
