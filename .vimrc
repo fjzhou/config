@@ -3,6 +3,7 @@ source $VIMRUNTIME/vimrc_example.vim
 
 " pathogen
 call pathogen#infect()
+call pathogen#helptags()
 syntax on
 filetype plugin indent on
 
@@ -21,17 +22,18 @@ set undodir=~/.undodir
 set fileformats=unix,dos
 
 " Menu
-set langmenu=zh_CN.UTF-8
-language message zh_CN.UTF-8
-source $VIMRUNTIME/delmenu.vim  
-source $VIMRUNTIME/menu.vim  
-language messages zh_CN.utf-8
+if has("gui_running")
+    set langmenu=zh_CN.UTF-8
+    language message zh_CN.UTF-8
+    source $VIMRUNTIME/delmenu.vim  
+    source $VIMRUNTIME/menu.vim  
+endif
 
 " Appearance
 set autoindent
 set smartindent
 set shiftwidth=4
-set guifont=Source\ Code\ Pro:h14
+set guifont=Source\ Code\ Pro\ for\ Powerline:h14
 set expandtab
 "set helplang=cn
 set tabstop=4
@@ -39,11 +41,11 @@ set tabstop=4
 "set lines=35
 "set columns=90
 
-if has("win32")
-    language en
-else
-    language en_US
-endif
+"if has("win32")
+"    language en
+"else
+"    language en_US
+"endif
 
 " Windows use DirectX
 if has("gui_win32")
@@ -60,9 +62,14 @@ else
     colorscheme solarized
     set background=dark
 endif
+" Mac
+"let os = substitute(system('uname'), '\n', '', '')
+"if os == 'Darwin' || os == 'Mac'
+"    set background=dark
+"endif
 
 " statusline
-set statusline=%F%m%r%h%w\ [%{&ff}:%{&fenc!=''?&fenc:&enc}]\ [%Y]\ [0x\%02.2B]\ [%04l,%04v] 
+"set statusline=%F%m%r%h%w\ [%{&ff}:%{&fenc!=''?&fenc:&enc}]\ [%Y]\ [0x\%02.2B]\ [%04l,%04v] 
 set laststatus=2
 
 
@@ -116,9 +123,33 @@ let g:user_emmet_settings = {
 \    'extends' : 'html',
 \  },
 \}
+" Add syntax rule
+let g:markdown_quote_syntax_filetypes = {
+      \ "css" : {
+      \   "start" : "\\%(css\\|scss\\)",
+      \},
+      \ "cs" : {
+      \   "start" : "\\%(csharp\\|cs\\)",
+      \},
+      \ "xml" : {
+      \   "start" : "xml",
+      \},
+      \ "objc" : {
+      \   "start" : "objc",
+      \},
+      \ "sh" : {
+      \   "start" : "sh",
+      \}
+\}
 
 "Airline
 let g:airline_skip_empty_sections=1
 let g:airline#extensions#tabline#enabled = 1
 set t_Co=256
 let g:airline_powerline_fonts = 1  
+
+"NeoComplcache
+let g:neocomplcache_enable_at_startup=1
+
+"Pymode
+let g:pymode_python = 'python3'
