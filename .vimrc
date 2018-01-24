@@ -101,7 +101,8 @@ nmap <leader>d :NERDTreeToggle<CR>
 nmap <leader>f :NERDTreeFind<CR>
 nmap <leader>t :CtrlP<CR>
 nmap <leader>T :CtrlPClearCache<CR>:CtrlP<CR><CR>
-nmap <leader>] :TagbarToggle<CR>
+"nmap <leader>] :TagbarToggle<CR>
+nmap <leader>] :TlistToggle<CR>
 nmap <leader><space> :call whitespace#strip_trailing()<CR>
 nmap <leader>g :GitGutterToggle<CR>
 nmap <leader>c <Plug>Kwbd
@@ -155,3 +156,8 @@ let g:neocomplcache_enable_at_startup=1
 
 "Pymode
 let g:pymode_python = 'python3'
+
+"taglist
+let Tlist_Use_Right_Window=1
+let Tlist_File_Fold_Auto_Close=1
+let Tlist_Exit_OnlyWindow=1
