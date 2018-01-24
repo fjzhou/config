@@ -53,6 +53,7 @@ if has("gui_win32")
 endif
 
 " GUI use solarized
+let t_Co=256
 let g:solarized_termcolors=256
 if has("gui_running") && !has("gui_macvim")
     set background=light
