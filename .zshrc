@@ -102,6 +102,8 @@ export EDITOR=vim
 export PGDATA=$POSTGRESQL_HOME/data
 export OPENSSL_CONF=/var/MyCA/openssl.cnf
 export JAVA_HOME
+export SSH_CLIENT=
+export TERM=xterm-256color
 
 #alias for cnpm
 #alias npm="npm --registry=https://registry.npm.taobao.org \
