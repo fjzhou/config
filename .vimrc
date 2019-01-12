@@ -108,6 +108,8 @@ nmap <leader>g :GitGutterToggle<CR>
 nmap <leader>c <Plug>Kwbd
 
 nmap <C-t> :tab new<CR>
+nmap <C-w> :tabclose<CR>
+nmap <leader>` :terminal<CR>
 
 " plugin settings
 let g:ctrlp_match_window = 'order:ttb,max:20'
