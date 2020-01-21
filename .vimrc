@@ -163,3 +163,9 @@ let g:pymode_python = 'python3'
 let Tlist_Use_Right_Window=1
 let Tlist_File_Fold_Auto_Close=1
 let Tlist_Exit_OnlyWindow=1
+
+" vim-markdown
+let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_math = 1
+let g:vim_markdown_edit_url_in = 'buffer'
+let g:vim_markdown_toc_autofit = 1
