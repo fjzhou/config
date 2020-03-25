@@ -90,7 +90,8 @@ GRADLE_HOME=/usr/local/gradle
 POSTGRESQL_HOME=/usr/local/pgsql
 DOTNET_HOME=/usr/local/share/dotnet
 JAVA_HOME=/usr/local/jdk
-export PATH=$JAVA_HOME/bin:/usr/local/nodejs/bin:$ZSH_HOME/bin:$POSTGRESQL_HOME/bin:$GRADLE_HOME/bin:$GO_HOME/bin:$TOMCAT_HOME/bin:$MVN_HOME/bin:$OPENRESTY_HOME/luajit/bin:$OPENRESTY_HOME/nginx/sbin:$MYSQL_HOME/bin:$PHP_HOME/bin:$PYTHON3_HOME/bin:$TFS_HOME:/usr/local/bin:$DOTNET_HOME:$PATH
+NODE_HOME=/usr/local/node
+export PATH=$JAVA_HOME/bin:$NODE_HOME/bin:/usr/local/nodejs/bin:$ZSH_HOME/bin:$POSTGRESQL_HOME/bin:$GRADLE_HOME/bin:$GO_HOME/bin:$TOMCAT_HOME/bin:$MVN_HOME/bin:$OPENRESTY_HOME/luajit/bin:$OPENRESTY_HOME/nginx/sbin:$MYSQL_HOME/bin:$PHP_HOME/bin:$PYTHON3_HOME/bin:$TFS_HOME:/usr/local/bin:$DOTNET_HOME:$PATH
 export LANG=en_US.UTF-8
 export PYTHONPATH=~/webpy
 export NODE_PATH=/usr/local/lib/node_modules
@@ -105,6 +106,8 @@ export JAVA_HOME
 export SSH_CLIENT=
 export TERM=xterm-256color
 
+. ~/config/lscolors.sh
+
 #alias for cnpm
 #alias npm="npm --registry=https://registry.npm.taobao.org \
 #  --cache=$HOME/.npm/.cache/cnpm \
@@ -114,3 +117,4 @@ export TERM=xterm-256color
 [ -s "/Users/fjzhou/.dnx/dnvm/dnvm.sh" ] && . "/Users/fjzhou/.dnx/dnvm/dnvm.sh" # Load dnvm
 
 test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
+

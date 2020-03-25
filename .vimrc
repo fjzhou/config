@@ -57,12 +57,13 @@ let t_Co=256
 let g:solarized_termcolors=256
 set term=screen-256color
 if has("gui_running") && !has("gui_macvim")
-    set background=light
-    colorscheme solarized
+    "set background=light
+    "colorscheme solarized
 else
     "color molokai
-    colorscheme solarized
-    set background=dark
+    "colorscheme solarized
+    "set background=light
+    "set background=dark
 endif
 " Mac
 "let os = substitute(system('uname'), '\n', '', '')
