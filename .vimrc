@@ -1,5 +1,7 @@
 set nocompatible
-source $VIMRUNTIME/vimrc_example.vim
+if !has("nvim")
+    source $VIMRUNTIME/vimrc_example.vim
+endif
 
 " pathogen
 call pathogen#infect()
@@ -55,7 +57,9 @@ endif
 " GUI use solarized
 let t_Co=256
 let g:solarized_termcolors=256
-set term=screen-256color
+if !has("nvim")
+    set term=screen-256color
+endif
 if has("gui_running") && !has("gui_macvim")
     "set background=light
     "colorscheme solarized
