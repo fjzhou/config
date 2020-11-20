@@ -5,8 +5,8 @@ ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-#ZSH_THEME="robbyrussell"
-ZSH_THEME="agnoster"
+ZSH_THEME="robbyrussell"
+#ZSH_THEME="agnoster"
 DEFAULT_USER='fjzhou'
 
 
@@ -91,7 +91,7 @@ POSTGRESQL_HOME=/usr/local/pgsql
 DOTNET_HOME=/usr/local/share/dotnet
 JAVA_HOME=/usr/local/jdk
 NODE_HOME=/usr/local/node
-export PATH=$JAVA_HOME/bin:$NODE_HOME/bin:/usr/local/nodejs/bin:$ZSH_HOME/bin:$POSTGRESQL_HOME/bin:$GRADLE_HOME/bin:$GO_HOME/bin:$TOMCAT_HOME/bin:$MVN_HOME/bin:$OPENRESTY_HOME/luajit/bin:$OPENRESTY_HOME/nginx/sbin:$MYSQL_HOME/bin:$PHP_HOME/bin:$PYTHON3_HOME/bin:$TFS_HOME:/usr/local/bin:$DOTNET_HOME:$PATH
+export PATH=$JAVA_HOME/bin:$NODE_HOME/bin:/usr/local/nodejs/bin:$ZSH_HOME/bin:$POSTGRESQL_HOME/bin:$GRADLE_HOME/bin:$GO_HOME/bin:$TOMCAT_HOME/bin:$MVN_HOME/bin:$OPENRESTY_HOME/luajit/bin:$OPENRESTY_HOME/nginx/sbin:$MYSQL_HOME/bin:$PHP_HOME/bin:$PYTHON3_HOME/bin:$TFS_HOME:/usr/local/bin:$DOTNET_HOME:/usr/local/nvim/bin:$PATH
 export LANG=en_US.UTF-8
 export PYTHONPATH=~/webpy
 export NODE_PATH=/usr/local/lib/node_modules
