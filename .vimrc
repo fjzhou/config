@@ -97,10 +97,14 @@ au BufRead,BufNewFile *.aspx set filetype=html
 
 " keyboard shortcuts
 let mapleader = ','
-map <C-h> <C-w>h
-map <C-j> <C-w>j
-map <C-k> <C-w>k
-map <C-l> <C-w>l
+"map <C-h> <C-w>h
+"map <C-j> <C-w>j
+"map <C-k> <C-w>k
+"map <C-l> <C-w>l
+map <C-h> :wincmd h<CR>
+map <C-j> :wincmd j<CR>
+map <C-k> :wincmd k<CR>
+map <C-l> :wincmd l<CR>
 map <leader>l :Align
 nmap <leader>a :Ack 
 nmap <leader>b :CtrlPBuffer<CR>
