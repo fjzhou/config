@@ -59,10 +59,12 @@ set term=screen-256color
 if has("gui_running") && !has("gui_macvim")
     "set background=light
     "colorscheme solarized
+    set background=dark
+    "colorscheme molokai
 else
-    "color molokai
+    colorscheme molokai
     "colorscheme solarized
-    "set background=light
+    set background=light
     "set background=dark
 endif
 " Mac
@@ -159,6 +161,7 @@ let g:neocomplcache_enable_at_startup=1
 
 "Pymode
 let g:pymode_python = 'python3'
+let g:pymode_options_colorcolumn = 0
 
 "taglist
 let Tlist_Use_Right_Window=1
