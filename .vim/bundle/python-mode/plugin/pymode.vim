@@ -1,5 +1,5 @@
 " vi: fdl=1
-let g:pymode_version = "0.9.4"
+let g:pymode_version = "0.13.0"
 
 " Enable pymode by default :)
 call pymode#default('g:pymode', 1)
@@ -19,7 +19,11 @@ filetype plugin on
 " OPTIONS: {{{
 
 " Vim Python interpreter. Set to 'disable' for remove python features.
-call pymode#default('g:pymode_python', '')
+if has("python3") && executable('python3')
+    call pymode#default('g:pymode_python', 'python3')
+else
+    call pymode#default('g:pymode_python', 'disable')
+endif
 
 " Disable pymode warnings
 call pymode#default('g:pymode_warning', 1)
@@ -34,8 +38,10 @@ call pymode#default('g:pymode_doc_bind', 'K')
 " Enable/Disable pymode PEP8 indentation
 call pymode#default("g:pymode_indent", 1)
 
+" TODO: currently folding suffers from a bad performance and incorrect
+" implementation. This feature should be considered experimental.
 " Enable/disable pymode folding for pyfiles.
-call pymode#default("g:pymode_folding", 1)
+call pymode#default("g:pymode_folding", 0)
 " Maximum file length to check for nested class/def statements
 call pymode#default("g:pymode_folding_nest_limit", 1000)
 " Change for folding customization (by example enable fold for 'if', 'for')
@@ -61,6 +67,12 @@ call pymode#default('g:pymode_quickfix_maxheight', 6)
 
 " Maximal height of pymode quickfix window
 call pymode#default('g:pymode_quickfix_minheight', 3)
+
+" Height of preview window
+call pymode#default('g:pymode_preview_height', &previewheight)
+
+" Position of preview window
+call pymode#default('g:pymode_preview_position', 'botright')
 
 " LOAD VIRTUALENV {{{
 "
@@ -272,31 +284,16 @@ if &compatible
 endif
 filetype plugin on
 
-" Disable python-related functionality
-" let g:pymode_python = 'disable'
-" let g:pymode_python = 'python3'
-
 " UltiSnips Fixes
 if !len(g:pymode_python)
-    if exists('g:_uspy') && g:_uspy == ':py'
-        let g:pymode_python = 'python'
-    elseif exists('g:_uspy') && g:_uspy == ':py3'
-        let g:pymode_python = 'python3'
-    elseif has("python")
-        let g:pymode_python = 'python'
-    elseif has("python3")
+    if (exists('g:_uspy') && g:_uspy == ':py3') || has("python3")
         let g:pymode_python = 'python3'
     else
         let g:pymode_python = 'disable'
     endif
 endif
 
-if g:pymode_python == 'python'
-
-    command! -nargs=1 PymodePython python <args>
-    let g:UltiSnipsUsePythonVersion = 2
-
-elseif g:pymode_python == 'python3'
+if g:pymode_python == 'python3'
 
     command! -nargs=1 PymodePython python3 <args>
     let g:UltiSnipsUsePythonVersion = 3

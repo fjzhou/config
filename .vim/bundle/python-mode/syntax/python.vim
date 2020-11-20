@@ -129,7 +129,6 @@ endif
 
     syn match   pythonDecorator "@" display nextgroup=pythonDottedName skipwhite
     syn match   pythonDottedName "[a-zA-Z_][a-zA-Z0-9_]*\(\.[a-zA-Z_][a-zA-Z0-9_]*\)*" display contained
-    syn match   pythonDot        "\." display containedin=pythonDottedName
 
 " }}}
 
@@ -307,6 +306,12 @@ endif
         syn keyword pythonExClass   UnboundLocalError UnicodeError
         syn keyword pythonExClass   UnicodeEncodeError UnicodeDecodeError
         syn keyword pythonExClass   UnicodeTranslateError ValueError VMSError
+        syn keyword pythonExClass   BlockingIOError ChildProcessError ConnectionError
+        syn keyword pythonExClass   BrokenPipeError ConnectionAbortedError
+        syn keyword pythonExClass   ConnectionRefusedError ConnectionResetError
+        syn keyword pythonExClass   FileExistsError FileNotFoundError InterruptedError
+        syn keyword pythonExClass   IsADirectoryError NotADirectoryError PermissionError
+        syn keyword pythonExClass   ProcessLookupError TimeoutError
         syn keyword pythonExClass   WindowsError ZeroDivisionError
         syn keyword pythonExClass   Warning UserWarning BytesWarning DeprecationWarning
         syn keyword pythonExClass   PendingDepricationWarning SyntaxWarning
@@ -349,7 +354,6 @@ endif
 
     hi def link  pythonDecorator    Define
     hi def link  pythonDottedName   Function
-    hi def link  pythonDot          Normal
 
     hi def link  pythonComment      Comment
     hi def link  pythonCoding       Special

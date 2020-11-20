@@ -9,22 +9,26 @@ fun! pymode#breakpoint#init() "{{{
 
         PymodePython << EOF
 
-from imp import find_module
+from importlib.util import find_spec
 
-for module in ('wdb', 'pudb', 'ipdb'):
-    try:
-        find_module(module)
-        vim.command('let g:pymode_breakpoint_cmd = "import %s; %s.set_trace()  # XXX BREAKPOINT"' % (module, module))
-        break
-    except ImportError:
-        continue
+if sys.version_info >= (3, 7):
+    vim.command('let g:pymode_breakpoint_cmd = "breakpoint()"')
 
+else:
+    for module in ('wdb', 'pudb', 'ipdb', 'pdb'):
+        if find_spec(module):
+            vim.command('let g:pymode_breakpoint_cmd = "import %s; %s.set_trace()  # XXX BREAKPOINT"' % (module, module))
+            break
 EOF
     endif
 
 endfunction "}}}
 
 fun! pymode#breakpoint#operate(lnum) "{{{
+    if g:pymode_breakpoint_cmd == ''
+        echoerr("g:pymode_breakpoint_cmd is empty")
+        return -1
+    endif
     let line = getline(a:lnum)
     if strridx(line, g:pymode_breakpoint_cmd) != -1
         normal dd

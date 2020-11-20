@@ -1,9 +1,12 @@
 """Pymode support functions."""
 
-from __future__ import absolute_import
-
 import sys
+from importlib.machinery import PathFinder as _PathFinder
+
 import vim  # noqa
+
+if not hasattr(vim, 'find_module'):
+    vim.find_module = _PathFinder.find_module
 
 
 def auto():
@@ -22,6 +25,7 @@ def auto():
         in_place = True
         indent_size = int(vim.eval('&tabstop'))
         line_range = None
+        hang_closing = False
         max_line_length = int(vim.eval('g:pymode_options_max_line_length'))
         pep8_passes = 100
         recursive = False
@@ -33,7 +37,7 @@ def auto():
 
 def get_documentation():
     """Search documentation and append to current buffer."""
-    from ._compat import StringIO
+    from io import StringIO
 
     sys.stdout, _ = StringIO(), sys.stdout
     help(vim.eval('a:word'))
