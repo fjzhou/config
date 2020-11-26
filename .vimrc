@@ -1,7 +1,7 @@
 set nocompatible
-if !has("nvim")
-    source $VIMRUNTIME/vimrc_example.vim
-endif
+"if !has("nvim")
+"    source $VIMRUNTIME/vimrc_example.vim
+"endif
 
 " pathogen
 call pathogen#infect()
