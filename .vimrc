@@ -13,6 +13,8 @@ filetype plugin indent on
 set encoding=utf-8
 set fileencodings=utf-8,gb18030,utf-16,big5
 set nobackup
+set noswapfile
+set noundofile
 set nowrap
 set nu
 set clipboard+=unnamed
