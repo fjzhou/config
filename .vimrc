@@ -181,6 +181,22 @@ let Tlist_Use_Right_Window=1
 let Tlist_File_Fold_Auto_Close=1
 let Tlist_Exit_OnlyWindow=1
 
+"NERDTree
+let NERDTreeWinSize=18
+let NERDTreeIgnore=['\.pyc', '\~$', '\.swp', '.git', '.svn']
+let g:NERDTreeGitStatusIndicatorMapCustom = {
+                \ 'Modified'  :'✹',
+                \ 'Staged'    :'✚',
+                \ 'Untracked' :'✭',
+                \ 'Renamed'   :'➜',
+                \ 'Unmerged'  :'═',
+                \ 'Deleted'   :'✖',
+                \ 'Dirty'     :'✗',
+                \ 'Ignored'   :'☒',
+                \ 'Clean'     :'✔︎',
+                \ 'Unknown'   :'?',
+                \ }
+
 " vim-markdown
 let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_math = 1
