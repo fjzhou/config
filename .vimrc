@@ -37,7 +37,7 @@ endif
 set autoindent
 set smartindent
 set shiftwidth=4
-set guifont=Source\ Code\ Pro\ for\ Powerline:h14
+set guifont=Source\ Code\ Pro\ for\ Powerline:h15,Source\ Code\ Pro:h15
 set expandtab
 "set helplang=cn
 set tabstop=4
@@ -62,16 +62,16 @@ let g:solarized_termcolors=256
 if !has("nvim")
     set term=screen-256color
 endif
-if has("gui_running") && !has("gui_macvim")
+"if has("gui_running") && !has("gui_macvim")
+if has("gui_running")
     "set background=light
     "colorscheme solarized
+    colorscheme molokai
     set background=dark
-    "colorscheme molokai
 else
     colorscheme molokai
     "colorscheme solarized
-    set background=light
-    "set background=dark
+    set background=dark
 endif
 " Mac
 "let os = substitute(system('uname'), '\n', '', '')
@@ -171,6 +171,9 @@ let g:neocomplcache_enable_at_startup=1
 
 "Pymode
 let g:pymode_python = 'python3'
+if !has("nvim")
+    set pythonthreedll=/Library/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib
+endif
 let g:pymode_options_colorcolumn = 0
 
 "taglist
