@@ -1,0 +1,74 @@
+Host github.com
+  User git
+  Hostname github.com
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/id_rsa
+
+Host bitbucket.com
+  User git
+  Hostname github.com
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/id_rsa
+
+Host coding.net
+  User git
+  Hostname coding.net
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/id_rsa
+
+Host gitcafe.com
+  User git
+  Hostname gitcafe.com
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/id_rsa
+
+Host 10.0.*.*
+  User root
+  IdentityFile ~/.ssh/work_id_rsa
+
+Host 61.153.17.*
+  User root
+  IdentityFile ~/.ssh/work_id_rsa
+
+Host 61.174.68.*
+  User root
+  IdentityFile ~/.ssh/work_id_rsa
+
+Host *.cnool.net
+  User root
+  IdentityFile ~/.ssh/work_id_rsa
+
+Host 61.153.18.157
+  User pi
+  Port 22
+  IdentityFile ~/.ssh/fjzhou_id_rsa
+Host 61.153.18.159
+  User pi 
+  Port 2222
+  IdentityFile ~/.ssh/fjzhou_id_rsa
+
+Host dev.fjzhou.me 
+  User root 
+  Port 8000
+  IdentityFile ~/.ssh/fjzhou_id_rsa
+Host ckvm.fjzhou.me 
+  User root 
+  Port 8000
+  IdentityFile ~/.ssh/fjzhou_id_rsa
+
+Host local.fjzhou.me 
+  User root 
+  Port 8400
+  IdentityFile ~/.ssh/fjzhou_id_rsa
+
+Host 61.153.18.*
+  User root 
+  IdentityFile ~/.ssh/work_id_rsa
+
+
+Host 192.168.1.13
+  User pi 
+  IdentityFile ~/.ssh/fjzhou_id_rsa
+
+Host 192.168.*.*
+  IdentityFile ~/.ssh/fjzhou_id_rsa
