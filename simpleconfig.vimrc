@@ -62,3 +62,4 @@ nmap <leader>c <Plug>Kwbd
 nmap <C-t> :tab new<CR>
 nmap <C-w> :tabclose<CR>
 nmap <leader>` :terminal<CR>
+
