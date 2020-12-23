@@ -211,3 +211,8 @@ let g:vim_markdown_folding_disabled = 1
 let g:vim_markdown_math = 1
 let g:vim_markdown_edit_url_in = 'buffer'
 let g:vim_markdown_toc_autofit = 1
+
+" taglist
+nnoremap <silent> <F8> :TlistToggle<CR>
+let Tlist_WinWidth=20
+" let Tlist_Use_Right_Window=1
