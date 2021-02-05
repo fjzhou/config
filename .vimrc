@@ -37,7 +37,7 @@ endif
 set autoindent
 set smartindent
 set shiftwidth=4
-set guifont=Source\ Code\ Pro\ for\ Powerline:h15,Source\ Code\ Pro:h15
+set guifont=Source\ Code\ Pro\ for\ Powerline:h15,Source\ Code\ Pro:h15,Yahei\ Consolas\ Hybrid:h12
 set expandtab
 "set helplang=cn
 set tabstop=4
@@ -59,7 +59,7 @@ endif
 " GUI use solarized
 let t_Co=256
 let g:solarized_termcolors=256
-if !has("nvim")
+if !has("nvim") && !has("gui_running") && !has("win32")
     set term=screen-256color
 endif
 "if has("gui_running") && !has("gui_macvim")
