@@ -216,3 +216,6 @@ let g:vim_markdown_toc_autofit = 1
 nnoremap <silent> <F8> :TlistToggle<CR>
 let Tlist_WinWidth=20
 " let Tlist_Use_Right_Window=1
+
+" Which-Key
+nnoremap <silent> <leader> :<c-u>WhichKey ','<CR>
