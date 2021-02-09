@@ -219,3 +219,15 @@ let Tlist_WinWidth=20
 
 " Which-Key
 nnoremap <silent> <leader> :<c-u>WhichKey ','<CR>
+
+" easymotion
+let g:EasyMotion_do_mapping = 0
+let g:EasyMotion_smartcase = 1
+nmap s <Plug>(easymotion-overwin-f2)
+map <Leader><Leader>j <Plug>(easymotion-j)
+map <Leader><Leader>k <Plug>(easymotion-k)
+
+map / <Plug>(easymotion-sn)
+omap / <Plug>(easymotion-tn)
+map n <Plug>(easymotion-next)
+map N <Plug>(easymotion-prev)
