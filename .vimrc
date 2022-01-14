@@ -116,6 +116,7 @@ map <C-h> :wincmd h<CR>
 map <C-j> :wincmd j<CR>
 map <C-k> :wincmd k<CR>
 map <C-l> :wincmd l<CR>
+map <C-]> :pop<CR>
 map <leader>l :Align
 nmap <leader>a :Ack 
 nmap <leader>b :CtrlPBuffer<CR>
@@ -130,7 +131,7 @@ nmap <leader>g :GitGutterToggle<CR>
 nmap <leader>c <Plug>Kwbd
 
 nmap <C-t> :tab new<CR>
-nmap <C-w> :tabclose<CR>
+"nmap <C-w> :tabclose<CR>
 nmap <leader>` :terminal<CR>
 
 " plugin settings
