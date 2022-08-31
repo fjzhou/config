@@ -73,6 +73,9 @@ else
     "colorscheme solarized
     set background=dark
 endif
+if has("vcon")
+    set termguicolors
+endif
 
 "ConEmu
 if has("win32") && !has("gui_running") && !empty($CONEMUBUILD)
