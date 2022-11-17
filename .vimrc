@@ -108,6 +108,7 @@ au BufRead,BufNewFile *.go set filetype=go
 au BufRead,BufNewFile *.m set filetype=objc
 au BufRead,BufNewFile *.m set nocindent
 au BufRead,BufNewFile *.aspx set filetype=html
+au BufRead,BufNewFile *.txt set wrap
 
 " keyboard shortcuts
 let mapleader = ','
