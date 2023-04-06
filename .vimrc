@@ -65,12 +65,12 @@ endif
 "if has("gui_running") && !has("gui_macvim")
 if has("gui_running")
     "set background=light
-    "colorscheme solarized
-    colorscheme molokai
+    "colorscheme molokai
+    colorscheme atom-dark-256
     set background=dark
 else
-    colorscheme molokai
-    "colorscheme solarized
+    "colorscheme molokai
+    colorscheme atom-dark-256
     set background=dark
 endif
 if has("vcon")
