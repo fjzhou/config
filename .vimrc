@@ -16,6 +16,7 @@ set nobackup
 set noswapfile
 set noundofile
 set nowrap
+set nobomb
 set nu
 set clipboard+=unnamed
 set directory-=.
@@ -24,6 +25,9 @@ set smartcase
 set directory=.,$TEMP
 set undodir=~/.undodir
 set fileformats=unix,dos
+
+set splitbelow
+set splitright
 
 " Menu
 if has("gui_running")
