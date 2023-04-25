@@ -35,6 +35,8 @@ if has("gui_running")
     language message zh_CN.UTF-8
     source $VIMRUNTIME/delmenu.vim  
     source $VIMRUNTIME/menu.vim  
+
+    set guioptions-=T
 endif
 
 " Appearance
