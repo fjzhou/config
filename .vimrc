@@ -70,17 +70,17 @@ if !has("nvim") && !has("gui_running") && !has("win32")
 endif
 "if has("gui_running") && !has("gui_macvim")
 if has("gui_running")
-    set background=light
-    "colorscheme molokai
+    "set background=light
+    colorscheme molokai
     "colorscheme atom-dark-256
     "set background=dark
-    colorscheme solarized
+    "colorscheme solarized
 else
-    "colorscheme molokai
+    colorscheme molokai
     "colorscheme atom-dark-256
     "set background=dark
-    set background=light
-    colorscheme solarized
+    "set background=light
+    "colorscheme solarized
 endif
 if has("vcon")
     set termguicolors
