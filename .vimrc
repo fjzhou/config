@@ -74,12 +74,13 @@ if has("gui_running")
     colorscheme molokai
     "colorscheme atom-dark-256
     "set background=dark
+    "colorscheme solarized
 else
     colorscheme molokai
     "colorscheme atom-dark-256
-    
-    "colorscheme solarized
     "set background=dark
+    "set background=light
+    "colorscheme solarized
 endif
 if has("vcon")
     set termguicolors

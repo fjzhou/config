@@ -1,0 +1,18 @@
+[user]
+	email = fjzhou@live.com
+	name = FJZhou
+
+[core]
+    editor = vim
+    excludesfile = ~/.gitignore_global
+
+[http]
+    postBuffer = 524288000
+    #proxy = socks5://192.168.10.155:1080
+    #proxy = socks5://61.153.18.157:1080
+[https]
+    #proxy = socks5://192.168.10.155:1080
+    #proxy = socks5://61.153.18.157:1080
+
+[alias]
+    lg = log --date=format:'%b %d,%Y %H:%M' --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%ae>%Creset'

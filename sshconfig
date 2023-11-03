@@ -1,74 +1,63 @@
-Host github.com
-  User git
-  Hostname github.com
-  PreferredAuthentications publickey
-  IdentityFile ~/.ssh/id_rsa
-
-Host bitbucket.com
-  User git
-  Hostname github.com
-  PreferredAuthentications publickey
-  IdentityFile ~/.ssh/id_rsa
-
-Host coding.net
-  User git
-  Hostname coding.net
-  PreferredAuthentications publickey
-  IdentityFile ~/.ssh/id_rsa
-
-Host gitcafe.com
-  User git
-  Hostname gitcafe.com
-  PreferredAuthentications publickey
-  IdentityFile ~/.ssh/id_rsa
-
-Host 10.0.*.*
-  User root
-  IdentityFile ~/.ssh/work_id_rsa
+Host *
+    Serveraliveinterval 30
 
 Host 61.153.17.*
-  User root
-  IdentityFile ~/.ssh/work_id_rsa
+    Kexalgorithms=+diffie-hellman-group-exchange-sha256
+    Hostkeyalgorithms=+ssh-rsa
+    Pubkeyacceptedkeytypes=+ssh-rsa
+    User root
+    IdentityFile ~/.ssh/work_id_rsa
 
 Host 61.174.68.*
-  User root
-  IdentityFile ~/.ssh/work_id_rsa
+    Kexalgorithms=+diffie-hellman-group-exchange-sha256
+    Hostkeyalgorithms=+ssh-rsa
+    Pubkeyacceptedkeytypes=+ssh-rsa
+    User root
+    IdentityFile ~/.ssh/work_id_rsa
 
-Host *.cnool.net
-  User root
-  IdentityFile ~/.ssh/work_id_rsa
-
-Host 61.153.18.157
-  User pi
-  Port 22
-  IdentityFile ~/.ssh/fjzhou_id_rsa
-Host 61.153.18.159
-  User pi 
-  Port 2222
-  IdentityFile ~/.ssh/fjzhou_id_rsa
-
-Host dev.fjzhou.me 
-  User root 
-  Port 8000
-  IdentityFile ~/.ssh/fjzhou_id_rsa
-Host ckvm.fjzhou.me 
-  User root 
-  Port 8000
-  IdentityFile ~/.ssh/fjzhou_id_rsa
-
-Host local.fjzhou.me 
-  User root 
-  Port 8400
-  IdentityFile ~/.ssh/fjzhou_id_rsa
+Host 61.153.18.129
+    Kexalgorithms=+diffie-hellman-group-exchange-sha256
+    Hostkeyalgorithms=+ssh-rsa
+    Pubkeyacceptedkeytypes=+ssh-rsa
+    User admin
 
 Host 61.153.18.*
-  User root 
+    Kexalgorithms=+diffie-hellman-group-exchange-sha256
+    Hostkeyalgorithms=+ssh-rsa
+    Pubkeyacceptedkeytypes=+ssh-rsa
+    User root
+    IdentityFile ~/.ssh/work_id_rsa
+
+Host 202.101.189.*
+  User root
   IdentityFile ~/.ssh/work_id_rsa
 
+Host cnool_app
+  HostName 121.41.199.233
+  User root
+  IdentityFile ~/.ssh/work_id_rsa
 
-Host 192.168.1.13
-  User pi 
-  IdentityFile ~/.ssh/fjzhou_id_rsa
+Host cnool_aliyun
+  HostName 118.31.7.6
+  User root
+  IdentityFile ~/.ssh/work_id_rsa
 
-Host 192.168.*.*
-  IdentityFile ~/.ssh/fjzhou_id_rsa
+Host nbycwy_iot
+  HostName 47.96.176.12
+  User root
+  IdentityFile ~/.ssh/work_id_rsa
+
+Host nbycwy_web
+  HostName 114.55.239.228
+  User root
+  IdentityFile ~/.ssh/work_id_rsa
+
+Host nbycwy_web2
+  HostName 114.55.40.240
+  User root
+  IdentityFile ~/.ssh/work_id_rsa
+
+Host zjzx
+  HostName 116.62.51.18
+  User root
+  IdentityFile ~/.ssh/work_id_rsa
