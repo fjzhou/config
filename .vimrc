@@ -71,13 +71,15 @@ endif
 "if has("gui_running") && !has("gui_macvim")
 if has("gui_running")
     "set background=light
-    "colorscheme molokai
-    colorscheme atom-dark-256
-    set background=dark
+    colorscheme molokai
+    "colorscheme atom-dark-256
+    "set background=dark
 else
-    "colorscheme molokai
-    colorscheme atom-dark-256
-    set background=dark
+    colorscheme molokai
+    "colorscheme atom-dark-256
+    
+    "colorscheme solarized
+    "set background=dark
 endif
 if has("vcon")
     set termguicolors
@@ -242,3 +244,18 @@ map / <Plug>(easymotion-sn)
 omap / <Plug>(easymotion-tn)
 map n <Plug>(easymotion-next)
 map N <Plug>(easymotion-prev)
+
+" TableMode
+function! s:isAtStartOfLine(mapping)
+    let text_before_cursor = getline('.')[0 : col('.')-1]
+    let mapping_pattern = '\V' . escape(a:mapping, '\')
+    let comment_pattern = '\V' . escape(substitute(&l:commentstring, '%s.*$', '', ''), '\')
+    return (text_before_cursor =~? '^' . ('\v(' . comment_pattern . '\v)?') . '\s*\v' . mapping_pattern . '\v$')
+endfunction
+
+inoreabbrev <expr> <bar><bar>
+            \ <SID>isAtStartOfLine('\|\|') ?
+            \ '<c-o>:TableModeEnable<cr><bar><space><bar><left><left>' : '<bar><bar>'
+inoreabbrev <expr> __
+            \ <SID>isAtStartOfLine('__') ?
+            \ '<c-o>:silent! TableModeDisable<cr>' : '__'
