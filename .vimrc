@@ -4,8 +4,8 @@ set nocompatible
 "endif
 
 " pathogen
-"call pathogen#infect()
-"call pathogen#helptags()
+call pathogen#infect()
+call pathogen#helptags()
 syntax on
 filetype plugin indent on
 
@@ -198,6 +198,7 @@ if !has("nvim")
     set pythonthreedll=/Library/Frameworks/Python.framework/Versions/3.9/lib/libpython3.9.dylib
 endif
 let g:pymode_options_colorcolumn = 0
+let g:pymode_lint_ignore = ["E501"]
 
 "taglist
 let Tlist_Use_Right_Window=1
