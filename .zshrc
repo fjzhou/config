@@ -120,4 +120,5 @@ test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_in
 
 
 export TZ='Asia/Shanghai'
+export GPG_TTY=$(tty)
 cd
