@@ -1,19 +1,14 @@
-# Copyright (c) 2016-2018, 2020 Claudiu Popa <pcmanticore@gmail.com>
-# Copyright (c) 2016, 2019 Ashley Whetter <ashley@awhetter.co.uk>
-# Copyright (c) 2016 Derek Gustafson <degustaf@gmail.com>
-# Copyright (c) 2018 Anthony Sottile <asottile@umich.edu>
-# Copyright (c) 2019 Hugo van Kemenade <hugovk@users.noreply.github.com>
-# Copyright (c) 2019 Pierre Sassoulas <pierre.sassoulas@gmail.com>
-# Copyright (c) 2020 Damien Baty <damien.baty@polyconseil.fr>
-
 # Licensed under the GPL: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-# For details: https://github.com/PyCQA/pylint/blob/master/COPYING
+# For details: https://github.com/PyCQA/pylint/blob/main/LICENSE
+# Copyright (c) https://github.com/PyCQA/pylint/blob/main/CONTRIBUTORS.txt
 
-"""Unit tests for the pylint checkers in :mod:`pylint.extensions.check_docs`,
-in particular the parameter documentation checker `DocstringChecker`
-"""
+"""Unit tests for utils functions in :mod:`pylint.extensions._check_docs_utils`."""
+
+from __future__ import annotations
+
 import astroid
 import pytest
+from astroid import nodes
 
 from pylint.extensions import _check_docs_utils as utils
 
@@ -22,8 +17,8 @@ from pylint.extensions import _check_docs_utils as utils
     "string,count",
     [("abc", 0), ("", 0), ("  abc", 2), ("\n  abc", 0), ("   \n  abc", 3)],
 )
-def test_space_indentation(string, count):
-    """Test for pylint_plugin.ParamDocChecker"""
+def test_space_indentation(string: str, count: int) -> None:
+    """Test for pylint_plugin.ParamDocChecker."""
     assert utils.space_indentation(string) == count
 
 
@@ -143,6 +138,19 @@ def test_space_indentation(string, count):
         ),
     ],
 )
-def test_exception(raise_node, expected):
-    found = utils.possible_exc_types(raise_node)
-    assert found == expected
+def test_exception(raise_node: nodes.NodeNG, expected: set[str]) -> None:
+    found_nodes = utils.possible_exc_types(raise_node)
+    for node in found_nodes:
+        assert isinstance(node, astroid.nodes.ClassDef)
+    assert {node.name for node in found_nodes} == expected
+
+
+def test_possible_exc_types_raising_potential_none() -> None:
+    raise_node = astroid.extract_node(
+        """
+    def a():
+        return
+    raise a()  #@
+    """
+    )
+    assert utils.possible_exc_types(raise_node) == set()

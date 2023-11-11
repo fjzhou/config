@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import with_statement
 from setuptools import setup
 
 
@@ -28,17 +26,12 @@ setup(
     author_email='johann@rocholl.net',
     maintainer='Ian Lee',
     maintainer_email='IanLee1521@gmail.com',
-    url='https://pycodestyle.readthedocs.io/',
+    url='https://pycodestyle.pycqa.org/',
     license='Expat license',
     py_modules=['pycodestyle'],
-    namespace_packages=[],
     include_package_data=True,
     zip_safe=False,
-    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
-    install_requires=[
-        # Broken with Python 3: https://github.com/pypa/pip/issues/650
-        # 'setuptools',
-    ],
+    python_requires='>=3.6',
     entry_points={
         'console_scripts': [
             'pycodestyle = pycodestyle:_main',
@@ -51,11 +44,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
@@ -63,5 +52,8 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    test_suite='testsuite.test_all.suite',
+    project_urls={
+        'Changes':
+        'https://pycodestyle.pycqa.org/en/latest/developer.html#changes',
+    },
 )

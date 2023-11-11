@@ -1,13 +1,13 @@
 If you document the parameters of your functions, methods and constructors and
 their types systematically in your code this optional component might
 be useful for you. Sphinx style, Google style, and Numpy style are supported.
-(For some examples, see https://pypi.python.org/pypi/sphinxcontrib-napoleon .)
+(For some examples, see https://pypi.org/project/sphinxcontrib-napoleon/ .)
 
 You can activate this checker by adding the line::
 
     load-plugins=pylint.extensions.docparams
 
-to the ``MASTER`` section of your ``.pylintrc``.
+to the ``MAIN`` section of your ``.pylintrc``.
 
 This checker verifies that all function, method, and constructor docstrings
 include documentation of the
@@ -90,6 +90,9 @@ You'll be notified of **missing parameter documentation** but also of
 **naming inconsistencies** between the signature and the documentation which
 often arise when parameters are renamed automatically in the code, but not in
 the documentation.
+**Note:** by default docstrings of private and magic methods are not checked.
+To change this behaviour (for example, to also check ``__init__``) add
+``no-docstring-rgx=^(?!__init__$)_`` to the ``BASIC`` section of your ``.pylintrc``.
 
 Constructor parameters can be documented in either the class docstring or
 the ``__init__`` docstring, but not both::

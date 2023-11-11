@@ -1,6 +1,6 @@
-.svn/
-.hg/
-.hgtags/
+# Do not add entries specific to your dev environment or development
+# preferences in this file. You can use the global .gitignore for that:
+# git config --global core.excludesFile '~/.gitignore'
 /log
 *.py[cod]
 /build
@@ -9,19 +9,21 @@
 /pylint.egg-info/
 .tox
 *.sw[a-z]
-doc/technical_reference/extensions.rst
-doc/technical_reference/features.rst
+# Can't use | operator in .gitignore, see
+# https://unix.stackexchange.com/a/31806/189111
+doc/user_guide/messages/convention/
+doc/user_guide/messages/error/
+doc/user_guide/messages/fatal/
+doc/user_guide/messages/information/
+doc/user_guide/messages/refactor/
+doc/user_guide/messages/warning/
+tests/.pylint_primer_tests/
 pyve
 build-stamp
-debian/files
-debian/pylint.*.log
-debian/pylint.*.debhelper
-debian/pylint.substvars
-debian/pylint
 .coverage
 .coverage.*
-.idea
 .cache/
 .eggs/
 .pytest_cache/
 .mypy_cache/
+.benchmarks/

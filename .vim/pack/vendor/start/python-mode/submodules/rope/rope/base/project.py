@@ -1,27 +1,35 @@
+from __future__ import annotations
+import contextlib
+import json
 import os
-import shutil
 import sys
 import warnings
+from contextlib import ExitStack
+from typing import Optional
 
-import rope.base.fscommands
+import rope.base.fscommands  # Use full qualification for clarity.
 import rope.base.resourceobserver as resourceobserver
-import rope.base.utils.pycompat as pycompat
-from rope.base import exceptions, taskhandle, prefs, history, pycore, utils
+from rope.base import exceptions, history, pycore, taskhandle, utils
 from rope.base.exceptions import ModuleNotFoundError
+
+# At present rope.base.prefs starts with `# type:ignore`.
+# As a result, mypy knows nothing about Prefs and get_config.
+from rope.base.prefs import Prefs, get_config  # type:ignore
 from rope.base.resources import File, Folder, _ResourceMatcher
 
 try:
-    import cPickle as pickle
+    import cPickle as pickle  # type:ignore
 except ImportError:
-    import pickle
+    import pickle  # type:ignore
 
 
-class _Project(object):
+class _Project:
+    prefs: Prefs
 
     def __init__(self, fscommands):
         self.observers = []
         self.fscommands = fscommands
-        self.prefs = prefs.Prefs()
+        self.prefs = Prefs()
         self.data_files = _DataFiles(self)
         self._custom_source_folders = []
 
@@ -39,14 +47,14 @@ class _Project(object):
         path = self._get_resource_path(resource_name)
         if not os.path.exists(path):
             raise exceptions.ResourceNotFoundError(
-                'Resource <%s> does not exist' % resource_name)
+                "Resource <%s> does not exist" % resource_name
+            )
         elif os.path.isfile(path):
             return File(self, resource_name)
         elif os.path.isdir(path):
             return Folder(self, resource_name)
         else:
-            raise exceptions.ResourceNotFoundError('Unknown resource '
-                                                   + resource_name)
+            raise exceptions.ResourceNotFoundError("Unknown resource " + resource_name)
 
     def get_module(self, name, folder=None):
         """Returns a `PyObject` if the module was found."""
@@ -56,17 +64,15 @@ class _Project(object):
             return pymod
         module = self.find_module(name, folder)
         if module is None:
-            raise ModuleNotFoundError('Module %s not found' % name)
+            raise ModuleNotFoundError("Module %s not found" % name)
         return self.pycore.resource_to_pyobject(module)
 
     def get_python_path_folders(self):
         result = []
-        for src in self.prefs.get('python_path', []) + sys.path:
-            try:
+        for src in self.prefs.get("python_path", []) + sys.path:
+            with contextlib.suppress(exceptions.ResourceNotFoundError):
                 src_folder = get_no_project().get_resource(src)
                 result.append(src_folder)
-            except exceptions.ResourceNotFoundError:
-                pass
         return result
 
     # INFO: It was decided not to cache source folders, since:
@@ -104,7 +110,7 @@ class _Project(object):
         if observer in self.observers:
             self.observers.remove(observer)
 
-    def do(self, changes, task_handle=taskhandle.NullTaskHandle()):
+    def do(self, changes, task_handle=taskhandle.DEFAULT_TASK_HANDLE):
         """Apply the changes in a `ChangeSet`
 
         Most of the time you call this function for committing the
@@ -132,10 +138,10 @@ class _Project(object):
     def get_relative_module(self, name, folder, level):
         module = self.find_relative_module(name, folder, level)
         if module is None:
-            raise ModuleNotFoundError('Module %s not found' % name)
+            raise ModuleNotFoundError("Module %s not found" % name)
         return self.pycore.resource_to_pyobject(module)
 
-    def find_module(self, modname, folder=None):
+    def find_module(self, modname, folder=None) -> Optional[File]:
         """Returns a resource corresponding to the given module
 
         returns None if it can not be found
@@ -157,7 +163,7 @@ class _Project(object):
     def find_relative_module(self, modname, folder, level):
         for i in range(level - 1):
             folder = folder.parent
-        if modname == '':
+        if modname == "":
             return folder
         else:
             return _find_module_in_folder(folder, modname)
@@ -179,8 +185,7 @@ class _Project(object):
         return pycore.PyCore(self)
 
     def close(self):
-        warnings.warn('Cannot close a NoProject',
-                      DeprecationWarning, stacklevel=2)
+        warnings.warn("Cannot close a NoProject", DeprecationWarning, stacklevel=2)
 
     ropefolder = None
 
@@ -188,8 +193,9 @@ class _Project(object):
 class Project(_Project):
     """A Project containing files and folders"""
 
-    def __init__(self, projectroot, fscommands=None,
-                 ropefolder='.ropeproject', **prefs):
+    def __init__(
+        self, projectroot, fscommands=None, ropefolder=".ropeproject", **prefs
+    ):
         """A rope project
 
         :parameters:
@@ -203,29 +209,35 @@ class Project(_Project):
               overwrite config file preferences.
 
         """
-        if projectroot != '/':
-            projectroot = _realpath(projectroot).rstrip('/\\')
+        if projectroot != "/":
+            projectroot = _realpath(projectroot).rstrip("/\\")
+        assert isinstance(projectroot, str)
         self._address = projectroot
         self._ropefolder_name = ropefolder
         if not os.path.exists(self._address):
             os.mkdir(self._address)
         elif not os.path.isdir(self._address):
-            raise exceptions.RopeError('Project root exists and'
-                                       ' is not a directory')
+            raise exceptions.RopeError("Project root exists and" " is not a directory")
         if fscommands is None:
             fscommands = rope.base.fscommands.create_fscommands(self._address)
-        super(Project, self).__init__(fscommands)
+        super().__init__(fscommands)
         self.ignored = _ResourceMatcher()
         self.file_list = _FileListCacher(self)
-        self.prefs.add_callback('ignored_resources', self.ignored.set_patterns)
-        if ropefolder is not None:
-            self.prefs['ignored_resources'] = [ropefolder]
         self._init_prefs(prefs)
+        if ropefolder is not None:
+            self.prefs.add("ignored_resources", ropefolder)
         self._init_source_folders()
 
-    @utils.deprecated('Delete once deprecated functions are gone')
+    def __repr__(self):
+        return '<{}.{} "{}">'.format(
+            self.__class__.__module__,
+            self.__class__.__name__,
+            self.address,
+        )
+
+    @utils.deprecated("Delete once deprecated functions are gone")
     def _init_source_folders(self):
-        for path in self.prefs.get('source_folders', []):
+        for path in self.prefs.get("source_folders", []):
             folder = self.get_resource(path)
             self._custom_source_folders.append(folder)
 
@@ -234,19 +246,18 @@ class Project(_Project):
 
     def get_python_files(self):
         """Returns all python files available in the project"""
-        return [resource for resource in self.get_files()
-                if self.pycore.is_python_file(resource)]
+        return [
+            resource
+            for resource in self.get_files()
+            if self.pycore.is_python_file(resource)
+        ]
 
     def _get_resource_path(self, name):
-        return os.path.join(self._address, *name.split('/'))
+        return os.path.join(self._address, *name.split("/"))
 
     def _init_ropefolder(self):
-        if self.ropefolder is not None:
-            if not self.ropefolder.exists():
-                self._create_recursively(self.ropefolder)
-            if not self.ropefolder.has_child('config.py'):
-                config = self.ropefolder.create_file('config.py')
-                config.write(self._default_config())
+        if self.ropefolder is not None and not self.ropefolder.exists():
+            self._create_recursively(self.ropefolder)
 
     def _create_recursively(self, folder):
         if folder.parent != self.root and not folder.parent.exists():
@@ -254,34 +265,20 @@ class Project(_Project):
         folder.create()
 
     def _init_prefs(self, prefs):
-        run_globals = {}
-        if self.ropefolder is not None:
-            config = self.get_file(self.ropefolder.path + '/config.py')
-            run_globals.update({'__name__': '__main__',
-                                '__builtins__': __builtins__,
-                                '__file__': config.real_path})
-            if config.exists():
-                config = self.ropefolder.get_child('config.py')
-                pycompat.execfile(config.real_path, run_globals)
-            else:
-                exec(self._default_config(), run_globals)
-            if 'set_prefs' in run_globals:
-                run_globals['set_prefs'](self.prefs)
+        config = get_config(self.root, self.ropefolder).parse()
+        self.prefs = config
+        self.prefs.add_callback("ignored_resources", self.ignored.set_patterns)
+        self.ignored.set_patterns(self.prefs.ignored_resources)
         for key, value in prefs.items():
-            self.prefs[key] = value
+            self.prefs.set(key, value)
         self._init_other_parts()
         self._init_ropefolder()
-        if 'project_opened' in run_globals:
-            run_globals['project_opened'](self)
-
-    def _default_config(self):
-        import rope.base.default_config
-        import inspect
-        return inspect.getsource(rope.base.default_config)
+        if config.project_opened:
+            config.project_opened(self)
 
     def _init_other_parts(self):
         # Forcing the creation of `self.pycore` to register observers
-        self.pycore
+        self.pycore  # pylint: disable=pointless-statement
 
     def is_ignored(self, resource):
         return self.ignored.does_match(resource)
@@ -306,9 +303,9 @@ class Project(_Project):
     def validate(self, folder=None):
         if folder is None:
             folder = self.root
-        super(Project, self).validate(folder)
+        super().validate(folder)
 
-    root = property(lambda self: self.get_resource(''))
+    root = property(lambda self: self.get_resource(""))
     address = property(lambda self: self._address)
 
 
@@ -320,15 +317,15 @@ class NoProject(_Project):
 
     def __init__(self):
         fscommands = rope.base.fscommands.FileSystemCommands()
-        super(NoProject, self).__init__(fscommands)
+        super().__init__(fscommands)
 
     def _get_resource_path(self, name):
-        real_name = name.replace('/', os.path.sep)
+        real_name = name.replace("/", os.path.sep)
         return _realpath(real_name)
 
     def get_resource(self, name):
-        universal_name = _realpath(name).replace(os.path.sep, '/')
-        return super(NoProject, self).get_resource(universal_name)
+        universal_name = _realpath(name).replace(os.path.sep, "/")
+        return super().get_resource(universal_name)
 
     def get_files(self):
         return []
@@ -345,14 +342,13 @@ def get_no_project():
     return NoProject._no_project
 
 
-class _FileListCacher(object):
-
+class _FileListCacher:
     def __init__(self, project):
         self.project = project
         self.files = None
         rawobserver = resourceobserver.ResourceObserver(
-            self._changed, self._invalid, self._invalid,
-            self._invalid, self._invalid)
+            self._changed, self._invalid, self._invalid, self._invalid, self._invalid
+        )
         self.project.add_observer(rawobserver)
 
     def get_files(self):
@@ -376,46 +372,36 @@ class _FileListCacher(object):
         self.files = None
 
 
-class _DataFiles(object):
-
+class _DataFiles:
     def __init__(self, project):
         self.project = project
         self.hooks = []
 
-    def read_data(self, name, compress=False, import_=False):
+    def read_data(self, name):
         if self.project.ropefolder is None:
             return None
-        compress = compress and self._can_compress()
-        opener = self._get_opener(compress)
-        file = self._get_file(name, compress)
-        if not compress and import_:
-            self._import_old_files(name)
+        file = self._get_file(name)
         if file.exists():
-            input = opener(file.real_path, 'rb')
-            try:
+            with open(file.real_path, "rb") as input_file:
                 result = []
                 try:
                     while True:
-                        result.append(pickle.load(input))
+                        result.append(pickle.load(input_file))
                 except EOFError:
                     pass
                 if len(result) == 1:
                     return result[0]
                 if len(result) > 1:
                     return result
-            finally:
-                input.close()
 
-    def write_data(self, name, data, compress=False):
+    def write_data(self, name, data):
         if self.project.ropefolder is not None:
-            compress = compress and self._can_compress()
-            file = self._get_file(name, compress)
-            opener = self._get_opener(compress)
-            output = opener(file.real_path, 'wb')
-            try:
-                pickle.dump(data, output, 2)
-            finally:
-                output.close()
+            file = self._get_file(name)
+            with ExitStack() as cm:
+                output_file = cm.enter_context(open(file.real_path, "wb"))
+                output_file2 = cm.enter_context(open(file.real_path + ".json", "w"))
+                pickle.dump(data, output_file, 2)
+                json.dump(data, output_file2, default=lambda o: o.__getstate__())
 
     def add_write_hook(self, hook):
         self.hooks.append(hook)
@@ -424,32 +410,8 @@ class _DataFiles(object):
         for hook in self.hooks:
             hook()
 
-    def _can_compress(self):
-        try:
-            import gzip  # noqa
-            return True
-        except ImportError:
-            return False
-
-    def _import_old_files(self, name):
-        old = self._get_file(name + '.pickle', False)
-        new = self._get_file(name, False)
-        if old.exists() and not new.exists():
-            shutil.move(old.real_path, new.real_path)
-
-    def _get_opener(self, compress):
-        if compress:
-            try:
-                import gzip
-                return gzip.open
-            except ImportError:
-                pass
-        return open
-
-    def _get_file(self, name, compress):
-        path = self.project.ropefolder.path + '/' + name
-        if compress:
-            path += '.gz'
+    def _get_file(self, name):
+        path = self.project.ropefolder.path + "/" + name
         return self.project.get_file(path)
 
 
@@ -465,10 +427,10 @@ def _realpath(path):
 
     """
     # there is a bug in cygwin for os.path.abspath() for abs paths
-    if sys.platform == 'cygwin':
-        if path[1:3] == ':\\':
+    if sys.platform == "cygwin":
+        if path[1:3] == ":\\":
             return path
-        elif path[1:3] == ':/':
+        elif path[1:3] == ":/":
             path = "/cygdrive/" + path[0] + path[2:]
         return os.path.abspath(os.path.expanduser(path))
     return os.path.realpath(os.path.abspath(os.path.expanduser(path)))
@@ -476,16 +438,20 @@ def _realpath(path):
 
 def _find_module_in_folder(folder, modname):
     module = folder
-    packages = modname.split('.')
+    packages = modname.split(".")
     for pkg in packages[:-1]:
         if module.is_folder() and module.has_child(pkg):
             module = module.get_child(pkg)
         else:
             return None
     if module.is_folder():
-        if module.has_child(packages[-1]) and \
-           module.get_child(packages[-1]).is_folder():
+        if (
+            module.has_child(packages[-1])
+            and module.get_child(packages[-1]).is_folder()
+        ):
             return module.get_child(packages[-1])
-        elif module.has_child(packages[-1] + '.py') and \
-                not module.get_child(packages[-1] + '.py').is_folder():
-            return module.get_child(packages[-1] + '.py')
+        elif (
+            module.has_child(packages[-1] + ".py")
+            and not module.get_child(packages[-1] + ".py").is_folder()
+        ):
+            return module.get_child(packages[-1] + ".py")

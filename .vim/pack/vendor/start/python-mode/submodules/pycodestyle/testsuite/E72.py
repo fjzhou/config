@@ -80,3 +80,8 @@ try:
     pass
 except Exception:
     pass
+#: Okay
+from . import compute_type
+
+if compute_type(foo) == 5:
+    pass

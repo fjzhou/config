@@ -1,70 +1,49 @@
 """pycodestyle support."""
-from pycodestyle import BaseReport, StyleGuide, get_parser, _parse_multi_options
+from pycodestyle import BaseReport, Checker, StyleGuide, get_parser
 
-from pylama.lint import Linter as Abstract
-
-
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
+from pylama.context import RunContext
+from pylama.lint import LinterV2 as Abstract
 
 
 class Linter(Abstract):
-
     """pycodestyle runner."""
 
-    @staticmethod
-    def run(path, code=None, params=None, **meta):
-        """Check code with pycodestyle.
+    name = "pycodestyle"
 
-        :return list: List of errors.
-        """
-        parser = get_parser()
-        for option in parser.option_list:
-            if option.dest and option.dest in params:
-                value = params[option.dest]
-                if isinstance(value, str):
-                    params[option.dest] = option.convert_value(option, value)
+    def run_check(self, ctx: RunContext):  # noqa
+        """Check code with pycodestyle."""
+        params = ctx.get_params("pycodestyle")
+        options = ctx.options
+        if options:
+            params.setdefault("max_line_length", options.max_line_length)
 
-        for key in ["filename", "exclude", "select", "ignore"]:
-            if key in params and isinstance(params[key], str):
-                params[key] = _parse_multi_options(params[key])
+        if params:
+            parser = get_parser()
+            for option in parser.option_list:
+                if option.dest and option.dest in params:
+                    value = params[option.dest]
+                    if isinstance(value, str):
+                        params[option.dest] = option.convert_value(option, value)
 
-        P8Style = StyleGuide(reporter=_PycodestyleReport, **params)
-        buf = StringIO(code)
-        return P8Style.input_file(path, lines=buf.readlines())
+        style = StyleGuide(reporter=_PycodestyleReport, **params)
+        options = style.options
+        options.report.ctx = ctx  # type: ignore
+        checker = Checker(ctx.filename, lines=ctx.lines, options=options)
+        checker.check_all()
 
 
 class _PycodestyleReport(BaseReport):
 
-    def __init__(self, *args, **kwargs):
-        super(_PycodestyleReport, self).__init__(*args, **kwargs)
-        self.errors = []
+    ctx: RunContext
 
-    def init_file(self, filename, lines, expected, line_offset):
-        """Prepare storage for errors."""
-        super(_PycodestyleReport, self).init_file(
-            filename, lines, expected, line_offset)
-        self.errors = []
-
-    def error(self, line_number, offset, text, check):
+    def error(self, line_number, offset, text, _):
         """Save errors."""
-        code = super(_PycodestyleReport, self).error(
-            line_number, offset, text, check)
-
-        if code:
-            self.errors.append(dict(
-                text=text,
-                type=code.replace('E', 'C'),
-                col=offset + 1,
-                lnum=line_number,
-            ))
-
-    def get_file_results(self):
-        """Get errors.
-
-        :return list: List of errors.
-
-        """
-        return self.errors
+        code, _, text = text.partition(" ")
+        self.ctx.push(
+            text=text,
+            type=code[0],
+            number=code,
+            col=offset + 1,
+            lnum=line_number,
+            source="pycodestyle",
+        )

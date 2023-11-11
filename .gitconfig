@@ -1,18 +1,19 @@
 [user]
-	email = fjzhou@live.com
 	name = FJZhou
-
+	email = fjzhou@live.com
+    #signingkey = 33F60AF616D6CD6A5FF18E8DD81D23C800B4FABD
 [core]
-    editor = vim
-    excludesfile = ~/.gitignore_global
-
-[http]
-    postBuffer = 524288000
-    #proxy = socks5://192.168.10.155:1080
-    #proxy = socks5://61.153.18.157:1080
+	autocrlf = false
+	safecrlf = false
 [https]
-    #proxy = socks5://192.168.10.155:1080
-    #proxy = socks5://61.153.18.157:1080
-
+	#proxy = 'http://127.0.0.1:8118'
+    #proxy = socks5://127.0.0.1:1080
+[http]
+	#proxy = 'http://127.0.0.1:8118'
+    #proxy = socks5://127.0.0.1:1080
 [alias]
-    lg = log --date=format:'%b %d,%Y %H:%M' --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%ae>%Creset'
+	lg = log --date=format:'%b %d,%Y %H:%M' --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%ae>%Creset'
+[gpg]
+  #program = "C:\\Software\\GnuPG\\bin\\gpg.EXE"
+[commit]
+  #gpgsign = true

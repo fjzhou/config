@@ -1,6 +1,62 @@
 Changelog
 =========
 
+2.10.0 (2022-11-23)
+-------------------
+
+Changes:
+
+* E231: allow trailing comma inside 1-tuples in `[]`.  PR #1108.
+* W601, W602, W603, W604: removed (no longer relevant in python 3).  PR #1111.
+* E741: also apply to lambdas.  PR #1106.
+* E741: fix false positive for comparison operators.  PR #1118.
+
+2.9.1 (2022-08-03)
+------------------
+
+Changes:
+
+* E275: fix false positive for yield expressions.  PR #1091.
+
+2.9.0 (2022-07-30)
+------------------
+
+Changes:
+
+* E221, E222, E223, E224: add support for ``:=`` operator.  PR #1032.
+* Drop python 2.7 / 3.5.
+* E262: consider non-breaking spaces (``\xa0``) as whitespace.  PR #1035.
+* Improve performance of ``_is_binary_operator``.  PR #1052.
+* E275: requires whitespace around keywords.  PR #1063.
+* Add support for python 3.11. PR #1070.
+
+2.8.0 (2021-10-10)
+------------------
+
+Changes:
+
+* Drop python 3.4.  PR #982.
+* E712: fix false negative with multiple comparisons.  PR #987.
+* E211: fix false positives with ``match``.  PR #989.
+* E772: improve performance of bare except check.  PR #992.
+* Backport tokenize performance improvement from python 3.10.  PR #993.
+* E225: fix for lambdas containing positional-only args.  PR #1012.
+* Remove ``indent_size_str`` "setting".  PR #995.
+* E402: allow ``__all__`` to be typed.  PR #1019.
+* E225: fix false positives for ``*`` in ``case``.  PR #1003.
+* E201: detect tabs as whitespace.  PR #1015.
+
+
+2.7.0 (2021-03-14)
+------------------
+
+Changes:
+
+* Fix physical checks (such as W191) at end of file.  PR #961.
+* Add ``--indent-size`` option (defaulting to ``4``).  PR #970.
+* W605: fix escaped crlf false positive on windows.  PR #976.
+
+
 2.6.0 (2020-05-11)
 ------------------
 

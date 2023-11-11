@@ -1,7 +1,7 @@
 """ Checks that classes uses valid __slots__ """
 
-# pylint: disable=too-few-public-methods, missing-docstring, no-absolute-import, useless-object-inheritance
-# pylint: disable=using-constant-test, wrong-import-position, no-else-return, line-too-long
+# pylint: disable=too-few-public-methods, missing-docstring
+# pylint: disable=using-constant-test, wrong-import-position, no-else-return, line-too-long, unused-private-member
 from collections import deque
 
 def func():
@@ -11,60 +11,86 @@ def func():
         return [str(var) for var in range(3)]
 
 
-class NotIterable(object):
+class NotIterable:
     def __iter_(self):
         """ do nothing """
 
-class Good(object):
+class Good:
     __slots__ = ()
 
-class SecondGood(object):
+class SecondGood:
     __slots__ = []
 
-class ThirdGood(object):
+class ThirdGood:
     __slots__ = ['a']
 
-class FourthGood(object):
-    __slots__ = ('a%s' % i for i in range(10))
+class FourthGood:
+    __slots__ = (f'a{i}' for i in range(10))
 
-class FifthGood(object):
+class FifthGood:
     __slots__ = deque(["a", "b", "c"])
 
-class SixthGood(object):
+class SixthGood:
     __slots__ = {"a": "b", "c": "d"}
 
-class Bad(object): # [invalid-slots]
+class SeventhGood:
+    """type-annotated __slots__ with no value"""
+    __slots__: str
+
+class EigthGood:
+    """Multiple __slots__ declared in the class"""
+    x = 1
+    if x:
+        __slots__: str
+    else:
+        __slots__ = ("y",)
+
+class Bad: # [invalid-slots]
     __slots__ = list
 
-class SecondBad(object):  # [invalid-slots]
+class SecondBad:  # [invalid-slots]
     __slots__ = 1
 
-class ThirdBad(object):
+class ThirdBad:
     __slots__ = ('a', 2)  # [invalid-slots-object]
 
-class FourthBad(object):  # [invalid-slots]
+class FourthBad:  # [invalid-slots]
     __slots__ = NotIterable()
 
-class FifthBad(object):
+class FifthBad:
     __slots__ = ("a", "b", "")  # [invalid-slots-object]
 
-class SixthBad(object):  # [single-string-used-for-slots]
+class SixthBad:  # [single-string-used-for-slots]
     __slots__ = "a"
 
-class SeventhBad(object):  # [single-string-used-for-slots]
-    __slots__ = ('foo')
+class SeventhBad:  # [single-string-used-for-slots]
+    __slots__ = ('foo')  # [superfluous-parens]
 
-class EighthBad(object):  # [single-string-used-for-slots]
+class EighthBad:  # [single-string-used-for-slots]
     __slots__ = deque.__name__
 
-class PotentiallyGood(object):
+class NinthBad:
+    __slots__ = [str]  # [invalid-slots-object]
+
+class TenthBad:
+    __slots__ = [1 + 2 + 3]  # [invalid-slots-object]
+
+class EleventhBad:  # [invalid-slots]
+    __slots__ = None
+
+class TwelfthBad:  # [invalid-slots]
+    """One valid & one invalid __slots__ value"""
+    x = 1
+    if x:
+        __slots__ = ("y",)
+    else:
+        __slots__ = None
+
+class PotentiallyGood:
     __slots__ = func()
 
-class PotentiallySecondGood(object):
+class PotentiallySecondGood:
     __slots__ = ('a', deque.__name__)
-
-
-import six
 
 
 class Metaclass(type):
@@ -74,18 +100,17 @@ class Metaclass(type):
             yield str(value)
 
 
-@six.add_metaclass(Metaclass)
-class IterableClass(object):
+class IterableClass(metaclass=Metaclass):
     pass
 
-class PotentiallyThirdGood(object):
+class PotentiallyThirdGood:
     __slots__ = IterableClass
 
-class PotentiallyFourthGood(object):
+class PotentiallyFourthGood:
     __slots__ = Good.__slots__
 
 
-class ValueInSlotConflict(object):
+class ValueInSlotConflict:
     __slots__ = ('first', 'second', 'third', 'fourth') # [class-variable-slots-conflict, class-variable-slots-conflict, class-variable-slots-conflict]
     first = None
 
@@ -97,7 +122,7 @@ class ValueInSlotConflict(object):
         return self.third
 
 
-class Parent(object):
+class Parent:
     first = 42
 
 

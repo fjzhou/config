@@ -13,3 +13,6 @@ astroid.egg-info/
 .cache/
 .eggs/
 .pytest_cache/
+.mypy_cache/
+venv
+doc/_build/

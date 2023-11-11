@@ -1,13 +1,12 @@
 # Based on super lightweight Simple Top-Down Parser from http://effbot.org/zone/simple-top-down-parsing.htm
 # and https://bitbucket.org/emacsway/sqlbuilder/src/default/sqlbuilder/smartsql/contrib/evaluate.py
 import re
-from rope.base.utils import pycompat
-from rope.base.oi.type_hinting import utils
+
 from rope.base import utils as base_utils
+from rope.base.oi.type_hinting import utils
 
 
-class SymbolBase(object):
-
+class SymbolBase:
     name = None  # node/token type name
 
     def __init__(self):
@@ -17,32 +16,28 @@ class SymbolBase(object):
         self.third = None  # used by tree nodes
 
     def nud(self, parser):
-        raise SyntaxError(
-            "Syntax error (%r)." % self.name
-        )
+        raise SyntaxError("Syntax error (%r)." % self.name)
 
     def led(self, left, parser):
-        raise SyntaxError(
-            "Unknown operator (%r)." % self.name
-        )
+        raise SyntaxError("Unknown operator (%r)." % self.name)
 
     def evaluate(self, pyobject):
         raise NotImplementedError(self.name, self)
 
     def __repr__(self):
-        if self.name == '(name)':
-            return "(%s %s)" % (self.name[1:-1], self.value)
+        if self.name == "(name)":
+            return f"({self.name[1:-1]} {self.value})"
         out = [repr(self.name), self.first, self.second, self.third]
         out = [str(i) for i in out if i]
-        return '(' + ' '.join(out) + ')'
+        return "(" + " ".join(out) + ")"
 
 
-class SymbolTable(object):
-
+class SymbolTable:
     def multi(func):
         def _inner(self, names, *a, **kw):
             for name in names.split():
                 func(self, name, *a, **kw)
+
         return _inner
 
     def __init__(self):
@@ -74,7 +69,7 @@ class SymbolTable(object):
             s.lbp = max(bp, s.lbp)
         return s
 
-    @multi
+    @multi  # type:ignore
     def infix(self, name, bp):
         symbol = self.symbol(name, bp)
 
@@ -84,7 +79,7 @@ class SymbolTable(object):
             self.second = parser.expression(bp)
             return self
 
-    @multi
+    @multi  # type:ignore
     def infix_r(self, name, bp):
         symbol = self.symbol(name, bp)
 
@@ -106,8 +101,8 @@ class SymbolTable(object):
             self.third = parser.expression(symbol2.lbp + 0.1)
             return self
 
-    @multi
-    def prefix(self, name, bp):
+    @multi  # type:ignore
+    def prefix(self, name, bp):  # type:ignore
         symbol = self.symbol(name, bp)
 
         @method(symbol)
@@ -115,7 +110,7 @@ class SymbolTable(object):
             self.first = parser.expression(bp)
             return self
 
-    @multi
+    @multi  # type:ignore
     def postfix(self, name, bp):
         symbol = self.symbol(name, bp)
 
@@ -126,12 +121,13 @@ class SymbolTable(object):
 
     multi = staticmethod(multi)  # Just for code checker
 
+
 symbol_table = SymbolTable()
 
 
-class Lexer(object):
-
-    _token_pattern = re.compile(r"""
+class Lexer:
+    _token_pattern = re.compile(
+        r"""
         \s*
         (?:
               (
@@ -141,7 +137,9 @@ class Lexer(object):
               )  # operator
             | ([a-zA-Z](?:\w|\.)*)  # name
         )
-        """, re.U | re.S | re.X)
+        """,
+        re.U | re.S | re.X,
+    )
 
     def __init__(self, symbol_table):
         self.symbol_table = symbol_table
@@ -156,28 +154,29 @@ class Lexer(object):
                 s = symbol()
                 s.value = value
             else:
-                raise SyntaxError("Unknown operator ({0}). Possible operators are {1!r}".format(
-                    value, list(self.symbol_table)
-                ))
+                raise SyntaxError(
+                    "Unknown operator ({}). Possible operators are {!r}".format(
+                        value, list(self.symbol_table)
+                    )
+                )
 
             yield s
 
     def _tokenize_expr(self, program):
         if isinstance(program, bytes):
-            program = program.decode('utf-8')
+            program = program.decode("utf-8")
         # import pprint; pprint.pprint(self._token_pattern.findall(program))
         for operator, name in self._token_pattern.findall(program):
             if operator:
-                yield '(operator)', operator
+                yield "(operator)", operator
             elif name:
-                yield '(name)', name
+                yield "(name)", name
             else:
                 raise SyntaxError
-        yield '(end)', '(end)'
+        yield "(end)", "(end)"
 
 
-class Parser(object):
-
+class Parser:
     token = None
     next = None
 
@@ -186,10 +185,7 @@ class Parser(object):
 
     def parse(self, program):
         generator = self.lexer.tokenize(program)
-        try:
-            self.next = generator.__next__  # PY3
-        except AttributeError:
-            self.next = generator.next
+        self.next = generator.__next__
         self.token = self.next()
         return self.expression()
 
@@ -205,7 +201,7 @@ class Parser(object):
 
     def advance(self, name=None):
         if name and self.token.name != name:
-            raise SyntaxError("Expected {0!r} but found {1!r}".format(name, self.token.name))
+            raise SyntaxError(f"Expected {name!r} but found {self.token.name!r}")
         self.token = self.next()
 
 
@@ -218,107 +214,110 @@ def method(s):
 
     return bind
 
+
 symbol, infix, infix_r, prefix, postfix, ternary = (
-    symbol_table.symbol, symbol_table.infix, symbol_table.infix_r, symbol_table.prefix,
-    symbol_table.postfix, symbol_table.ternary
+    symbol_table.symbol,
+    symbol_table.infix,
+    symbol_table.infix_r,
+    symbol_table.prefix,
+    symbol_table.postfix,
+    symbol_table.ternary,
 )
 
-symbol('(', 270)
-symbol(')')
-symbol('[', 250)  # Parameters
-symbol(']')
-symbol('->', 230)
-infix('|', 170)
-infix('or', 170)
-symbol(',')
+symbol("(", 270)
+symbol(")")
+symbol("[", 250)  # Parameters
+symbol("]")
+symbol("->", 230)
+infix("|", 170)
+infix("or", 170)
+symbol(",")
 
-symbol('(name)')
-symbol('(end)')
+symbol("(name)")
+symbol("(end)")
 
 
-@method(symbol('(name)'))
+@method(symbol("(name)"))  # type:ignore
 def nud(self, parser):
     return self
 
 
-@method(symbol('(name)'))
+@method(symbol("(name)"))  # type:ignore
 def evaluate(self, pyobject):
     return utils.resolve_type(self.value, pyobject)
 
 
 # Parametrized objects
-@method(symbol('['))
+@method(symbol("["))  # type:ignore
 def led(self, left, parser):
     self.first = left
     self.second = []
-    if parser.token.name != ']':
+    if parser.token.name != "]":
         while 1:
-            if parser.token.name == ']':
+            if parser.token.name == "]":
                 break
             self.second.append(parser.expression())
-            if parser.token.name != ',':
+            if parser.token.name != ",":
                 break
-            parser.advance(',')
-    parser.advance(']')
+            parser.advance(",")
+    parser.advance("]")
     return self
 
 
-@method(symbol('['))
+@method(symbol("["))  # type:ignore
 def evaluate(self, pyobject):
     return utils.parametrize_type(
-        self.first.evaluate(pyobject),
-        *[i.evaluate(pyobject) for i in self.second]
+        self.first.evaluate(pyobject), *[i.evaluate(pyobject) for i in self.second]
     )
 
 
 # Anonymous Function Calls
-@method(symbol('('))
+@method(symbol("("))  # type:ignore
 def nud(self, parser):
     self.second = []
-    if parser.token.name != ')':
+    if parser.token.name != ")":
         while 1:
             self.second.append(parser.expression())
-            if parser.token.name != ',':
+            if parser.token.name != ",":
                 break
-            parser.advance(',')
-    parser.advance(')')
-    parser.advance('->')
-    self.third = parser.expression(symbol('->').lbp + 0.1)
+            parser.advance(",")
+    parser.advance(")")
+    parser.advance("->")
+    self.third = parser.expression(symbol("->").lbp + 0.1)
     return self
 
 
 # Function Calls
-@method(symbol('('))
+@method(symbol("("))  # type:ignore
 def led(self, left, parser):
     self.first = left
     self.second = []
-    if parser.token.name != ')':
+    if parser.token.name != ")":
         while 1:
             self.second.append(parser.expression())
-            if parser.token.name != ',':
+            if parser.token.name != ",":
                 break
-            parser.advance(',')
-    parser.advance(')')
-    parser.advance('->')
-    self.third = parser.expression(symbol('->').lbp + 0.1)
+            parser.advance(",")
+    parser.advance(")")
+    parser.advance("->")
+    self.third = parser.expression(symbol("->").lbp + 0.1)
     return self
 
 
-@method(symbol('('))
+@method(symbol("("))  # type:ignore
 def evaluate(self, pyobject):
     # TODO: Implement me
     raise NotImplementedError
 
 
-@method(symbol('or'))
-@method(symbol('|'))
+@method(symbol("or"))  # type:ignore
+@method(symbol("|"))
 def evaluate(self, pyobject):
     # TODO: Implement me
-    raise  NotImplementedError
+    raise NotImplementedError
 
 
-class Compiler(object):
-
+class Compiler:
     parser_factory = Parser
     lexer_factory = Lexer
     symbol_table = symbol_table
@@ -334,11 +333,11 @@ class Compiler(object):
         """
         return self._make_parser().parse(program)
 
+
 compile = Compiler()
 
 
-class Evaluator(object):
-
+class Evaluator:
     compile = compile
 
     def __call__(self, program, pyobject):
@@ -347,7 +346,8 @@ class Evaluator(object):
         :type program: str or rope.base.oi.type_hinting.evaluate.SymbolBase
         :rtype: rope.base.pyobjects.PyDefinedObject | rope.base.pyobjects.PyObject or None
         """
-        ast = self.compile(program) if isinstance(program, pycompat.string_types) else program
+        ast = self.compile(program) if isinstance(program, str) else program
         return ast.evaluate(pyobject)
+
 
 evaluate = Evaluator()

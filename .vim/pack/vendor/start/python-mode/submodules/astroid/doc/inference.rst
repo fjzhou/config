@@ -22,10 +22,10 @@ In both cases the :meth:`infer` must return a *generator* which iterates
 through the various *values* the node could take.
 
 In some case the value yielded will not be a node found in the AST of the node
-but an instance of a special inference class such as :class:`Uninferable`,
+but an instance of a special inference class such as :obj:`Uninferable`,
 or :class:`Instance`.
 
-Namely, the special singleton :obj:`Uninferable()` is yielded when the inference reaches
+Namely, the special singleton :obj:`Uninferable` is yielded when the inference reaches
 a point where it can't follow the code and is so unable to guess a value; and
 instances of the :class:`Instance` class are yielded when the current node is
 inferred to be an instance of some known class.
@@ -66,7 +66,7 @@ Most of the time you can access the same fields as those represented
 in the output of :meth:`repr_tree` so you can do ``tree.body[0].value.left``
 to get the left hand side operand of the addition operation.
 
-Another useful function that you can use is :func`astroid.extract_node`,
+Another useful function that you can use is :func:`astroid.extract_node`,
 which given a string, tries to extract one or more nodes from the given string::
 
    >>> node = astroid.extract_node('''

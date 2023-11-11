@@ -1,67 +1,98 @@
 """Pylama's shell support."""
 
-from __future__ import absolute_import, with_statement
-
 import sys
-from os import walk, path as op
+import warnings
+from json import dumps
+from os import path as op
+from os import walk
+from pathlib import Path
+from typing import List, Optional
 
-from .config import parse_options, CURDIR, setup_logger
-from .core import LOGGER, run
-from .check_async import check_async
+from pylama.check_async import check_async
+from pylama.config import CURDIR, Namespace, parse_options, setup_logger
+from pylama.core import LOGGER, run
+from pylama.errors import Error
+from pylama.utils import read_stdin
+
+DEFAULT_FORMAT = "{filename}:{lnum}:{col} [{etype}] {number} {message} [{source}]"
+MESSAGE_FORMATS = {
+    "pylint": "{filename}:{lnum}: [{etype}] {number} {message} [{source}]",
+    "pycodestyle": "{filename}:{lnum}:{col} {number} {message} [{source}]",
+    "parsable": DEFAULT_FORMAT,
+}
 
 
-def check_path(options, rootdir=None, candidates=None, code=None):
-    """Check path.
+def check_paths(
+    paths: Optional[List[str]],
+    options: Namespace,
+    code: str = None,
+    rootdir: Path = None,
+) -> List[Error]:
+    """Check the given paths.
 
     :param rootdir: Root directory (for making relative file paths)
     :param options: Parsed pylama options (from pylama.config.parse_options)
-
-    :returns: (list) Errors list
-
     """
-    if not candidates:
+    paths = paths or options.paths
+    if not paths:
+        return []
+
+    if code is None:
         candidates = []
-        for path_ in options.paths:
-            path = op.abspath(path_)
-            if op.isdir(path):
-                for root, _, files in walk(path):
-                    candidates += [op.relpath(op.join(root, f), CURDIR)
-                                   for f in files]
-            else:
-                candidates.append(path)
+        for path in paths or options.paths:
+            if not op.exists(path):
+                continue
+
+            if not op.isdir(path):
+                candidates.append(op.abspath(path))
+
+            for root, _, files in walk(path):
+                candidates += [op.relpath(op.join(root, f), CURDIR) for f in files]
+    else:
+        candidates = [paths[0]]
+
+    if not candidates:
+        return []
 
     if rootdir is None:
-        rootdir = path if op.isdir(path) else op.dirname(path)
+        path = candidates[0]
+        rootdir = Path(path if op.isdir(path) else op.dirname(path))
 
-    paths = []
-    for path in candidates:
-
-        if not options.force and not any(l.allow(path)
-                                         for _, l in options.linters):
-            continue
-
-        if not op.exists(path):
-            continue
-
-        paths.append(path)
+    candidates = [path for path in candidates if path.endswith(".py")]
 
     if options.concurrent:
-        return check_async(paths, options, rootdir)
+        return check_async(candidates, code=code, options=options, rootdir=rootdir)
 
     errors = []
-    for path in paths:
+    for path in candidates:
         errors += run(path=path, code=code, rootdir=rootdir, options=options)
+
     return errors
 
 
-def shell(args=None, error=True):
+def check_path(
+    options: Namespace,
+    rootdir: str = None,
+    candidates: List[str] = None,
+    code: str = None,  # noqa
+) -> List[Error]:
+    """Support legacy code."""
+    warnings.warn(
+        "pylama.main.check_path is depricated and will be removed in pylama 9",
+        DeprecationWarning,
+    )
+    return check_paths(
+        candidates,
+        code=code,
+        options=options,
+        rootdir=rootdir and Path(rootdir) or None,
+    )
+
+
+def shell(args: List[str] = None, error: bool = True):
     """Endpoint for console.
 
     Parse a command arguments, configuration files and run a checkers.
-
-    :return list: list of errors
-    :raise SystemExit:
-
     """
     if args is None:
         args = sys.argv[1:]
@@ -72,28 +103,22 @@ def shell(args=None, error=True):
 
     # Install VSC hook
     if options.hook:
-        from .hook import install_hook
+        from .hook import install_hook  # noqa
+
         for path in options.paths:
             return install_hook(path)
 
-    return process_paths(options, error=error)
+    if options.from_stdin and not options.paths:
+        LOGGER.error("--from-stdin requires a filename")
+        return sys.exit(1)
 
-
-def process_paths(options, candidates=None, error=True):
-    """Process files and log errors."""
-    errors = check_path(options, rootdir=CURDIR, candidates=candidates)
-
-    if options.format in ['pycodestyle', 'pep8']:
-        pattern = "%(filename)s:%(lnum)s:%(col)s: %(text)s"
-    elif options.format == 'pylint':
-        pattern = "%(filename)s:%(lnum)s: [%(type)s] %(text)s"
-    else:  # 'parsable'
-        pattern = "%(filename)s:%(lnum)s:%(col)s: [%(type)s] %(text)s"
-
-    for er in errors:
-        if options.abspath:
-            er._info['filename'] = op.abspath(er.filename)
-        LOGGER.warning(pattern, er._info)
+    errors = check_paths(
+        options.paths,
+        code=read_stdin() if options.from_stdin else None,
+        options=options,
+        rootdir=CURDIR,
+    )
+    display_errors(errors, options)
 
     if error:
         sys.exit(int(bool(errors)))
@@ -101,7 +126,18 @@ def process_paths(options, candidates=None, error=True):
     return errors
 
 
-if __name__ == '__main__':
+def display_errors(errors: List[Error], options: Namespace):
+    """Format and display the given errors."""
+    if options.format == "json":
+        LOGGER.warning(dumps([err.to_dict() for err in errors]))
+
+    else:
+        pattern = MESSAGE_FORMATS.get(options.format, DEFAULT_FORMAT)
+        for err in errors:
+            LOGGER.warning(err.format(pattern))
+
+
+if __name__ == "__main__":
     shell()
 
 # pylama:ignore=F0001

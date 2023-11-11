@@ -1,1 +1,2 @@
-Please read the [contribute doc](https://github.com/PyCQA/pylint/blob/master/doc/development_guide/contribute.rst).
+Please read the
+[contribute doc](https://pylint.readthedocs.io/en/latest/development_guide/contributor_guide/contribute.html).

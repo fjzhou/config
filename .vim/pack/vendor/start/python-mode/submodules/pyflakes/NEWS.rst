@@ -1,3 +1,46 @@
+3.0.1 (2022-11-24)
+
+- Fix crash on augmented assign to ``print`` builtin
+
+3.0.0 (2022-11-23)
+
+- Detect undefined name in variable defined by an annotated assignment
+- Add a new error for names which are annotated but unused
+- Remove handling of python 2.x ``# type:`` comments.  Use annotations instead
+
+2.5.0 (2022-07-30)
+
+- Drop support for EOL python 2.7 / 3.4 / 3.5
+- Ignore ``__all__`` when not directly assigned
+- Handle ``TypeAlias`` annotations as aliases (PEP 613)
+- Assignment expressions (``:=``) target outer scope in comprehensions
+- Add support for new python 3.11 syntax
+- Unify output so it is always ``filename:lineno:col:  message``
+- Properly report ``SyntaxError`` from stdin in python < 3.9
+- Fix offsets of ``SyntaxError``s in pypy
+
+2.4.0 (2021-10-06)
+
+- Remove unused tracing code (``traceTree``)
+- Add support for ``match`` statement
+- Detect ``typing`` module attributes when imported with ``import ... as ...``
+
+2.3.1 (2021-03-24)
+
+- Fix regression in 2.3.0: type annotations no longer redefine imports
+
+2.3.0 (2021-03-14)
+
+- Recognize tuple concatenation in ``__all__`` export definitions
+- Better support use of annotation-only assignments when using
+  ``from __future__ import annotations``
+- Recognize special-case typing for ``Annotated``
+- Fix undefined name ``__qualname__`` in class scope
+- Recognize special-cased typing for ``TypeVar``
+- Errors for undefined exports in ``__all__`` are shown in a deterministic order
+- Fix false positives in certain typing constructs (``TypeVar``,
+  ``NamedTuple``, ``TypedDict``, ``cast``)
+
 2.2.0 (2020-04-08)
 
 - Include column information in error messages

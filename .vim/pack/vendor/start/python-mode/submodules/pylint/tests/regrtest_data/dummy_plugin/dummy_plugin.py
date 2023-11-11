@@ -1,4 +1,5 @@
 from pylint.checkers import BaseChecker
+from pylint.lint.pylinter import PyLinter
 
 
 class DummyPlugin1(BaseChecker):
@@ -9,6 +10,7 @@ class DummyPlugin1(BaseChecker):
             'type': 'string',
             'metavar': '<string>',
             'help': 'Dummy option 1',
+            'default': ''
         }),
     )
 
@@ -21,10 +23,11 @@ class DummyPlugin2(BaseChecker):
             'type': 'string',
             'metavar': '<string>',
             'help': 'Dummy option 2',
+            'default': ''
         }),
     )
 
 
-def register(linter):
+def register(linter: "PyLinter") -> None:
     linter.register_checker(DummyPlugin1(linter))
     linter.register_checker(DummyPlugin2(linter))

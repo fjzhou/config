@@ -42,3 +42,17 @@ try:
     from importable.module import(e, f)
 except ImportError:
     pass
+#: E275
+if(foo):
+    pass
+else:
+    pass
+#: Okay
+matched = {"true": True, "false": False}
+#: E275:2:11
+if True:
+    assert(1)
+#: Okay
+def f():
+    print((yield))
+    x = (yield)

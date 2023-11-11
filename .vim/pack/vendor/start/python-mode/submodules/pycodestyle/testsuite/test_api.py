@@ -322,18 +322,6 @@ class APITestCase(unittest.TestCase):
         # < 3.3 raises TypeError; >= 3.3 raises AttributeError
         self.assertRaises(Exception, pep8style.check_files, [42])
 
-    def test_check_unicode(self):
-        # Do not crash if lines are Unicode (Python 2.x)
-        pycodestyle.register_check(DummyChecker, ['Z701'])
-        source = u'#\n'
-
-        pep8style = pycodestyle.StyleGuide()
-        count_errors = pep8style.input_file('stdin', lines=[source])
-
-        self.assertFalse(sys.stdout)
-        self.assertFalse(sys.stderr)
-        self.assertEqual(count_errors, 0)
-
     def test_check_nullbytes(self):
         pycodestyle.register_check(DummyChecker, ['Z701'])
 
@@ -341,10 +329,7 @@ class APITestCase(unittest.TestCase):
         count_errors = pep8style.input_file('stdin', lines=['\x00\n'])
 
         stdout = sys.stdout.getvalue()
-        if 'ValueError' in stdout:  # pragma: no cover (python 3.5+)
-            expected = "stdin:1:1: E901 ValueError"
-        else:  # pragma: no cover (< python3.5)
-            expected = "stdin:1:1: E901 TypeError"
+        expected = "stdin:1:1: E901 ValueError"
         self.assertTrue(stdout.startswith(expected),
                         msg='Output %r does not start with %r' %
                         (stdout, expected))
@@ -391,3 +376,52 @@ class APITestCase(unittest.TestCase):
 
         # TODO: runner
         # TODO: input_file
+
+    def test_styleguides_other_indent_size(self):
+        pycodestyle.register_check(DummyChecker, ['Z701'])
+        lines = [
+            'def foo():\n',
+            '    pass\n',
+            '\n',
+            '\n',
+            'def foo_correct():\n',
+            '   pass\n',
+            '\n',
+            '\n',
+            'def bar():\n',
+            '   [1, 2, 3,\n',
+            '     4, 5, 6,\n',
+            '     ]\n',
+            '\n',
+            '\n',
+            'if (1 in [1, 2, 3]\n',
+            '      and bool(0) is False\n',
+            '     and bool(1) is True):\n',
+            '   pass\n'
+        ]
+
+        pep8style = pycodestyle.StyleGuide()
+        pep8style.options.indent_size = 3
+        count_errors = pep8style.input_file('stdin', lines=lines)
+        stdout = sys.stdout.getvalue()
+        self.assertEqual(count_errors, 4)
+        expected = (
+            'stdin:2:5: '
+            'E111 indentation is not a multiple of 3'
+        )
+        self.assertTrue(expected in stdout)
+        expected = (
+            'stdin:11:6: '
+            'E127 continuation line over-indented for visual indent'
+        )
+        self.assertTrue(expected in stdout)
+        expected = (
+            'stdin:12:6: '
+            'E124 closing bracket does not match visual indentation'
+        )
+        self.assertTrue(expected in stdout)
+        expected = (
+            'stdin:17:6: '
+            'E127 continuation line over-indented for visual indent'
+        )
+        self.assertTrue(expected in stdout)

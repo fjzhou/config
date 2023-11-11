@@ -1,3 +1,123 @@
+2022-08-08  k.klenov
+	* Version 8.4.1
+        * Support TOML configuration (thank you https://github.com/villainy)
+        * Fix pylint integration
+        * Fix linting for empty files
+
+2022-03-11  k.klenov
+	* Version 8.3.8
+	* Better pytest integration
+
+2021-12-15  k.klenov
+	* Version 8.3.6
+	* Fixed processing of linters params
+
+2021-12-02  k.klenov
+	* Version 8.3.0
+	* Added support for default config file `~/.pylama.ini`
+
+2021-11-28  k.klenov
+	* Version 8.2.0
+	* Added `--max-line-length` to setup max line length for pycodestyle and
+	  pylint
+	* Support for linters options in command line
+
+2021-11-27  k.klenov
+
+	* Version 8.1.4
+	* Support json format
+	* Support `--from-stdin` option
+	* Changed: pylama only allows to check python files (--force is removed)
+	* Changed: mccabe argument `complexity` -> `max-complexity`
+
+2021-11-26  k.klenov
+
+	* Version 8.0.5
+	* Drop support for python 2
+	* Support python 3.7, 3.8, 3.9
+	* Support mccabe==0.6.1, pycodestyle==2.8.0, pydocstyle==6.1.1,
+		pyflakes==2.4.0, eradicate==2.0.0, radon==5.1.0, pylint==2.11.1
+	* Support vulture
+	* Support 'convention' for pydocstyle
+	* License changed to MIT (see LICENSE file for details)
+	* Fix Radon message format
+
+2019-04-10 k.klenov
+	* Version 7.7.1
+	* Fix CI by removing eradicate from linters
+
+2019-04-10 k.klenov
+	* Version 7.7.0
+	* Add note about configuration option names
+	* Added eradicate as a requirement #144
+	* Adds mypy linter #150
+	* Remove eradicate from default linters.
+
+2018-11-02 k.klenov
+	* Version 7.6.6
+	* Avoid reference usage for linter specific ignore/select
+	* Update Python requirements description
+	* Update the command help message description
+	* Add eradicate to tools references
+
+2018-10-10 k.klenov
+	* Version 7.6.5
+	* Fix build
+
+2018-10-09 k.klenov
+	* Version 7.6.4
+	* No changes other than version number
+
+2018-10-09 k.klenov
+	* Version 7.6.3
+	* Respect linters params
+
+2018-10-09 k.klenov
+	* Version 7.6.2
+	* No changes other than version number
+
+2018-10-09 k.klenov
+	* Version 7.6.1
+	* Merge #131
+
+2018-10-09 k.klenov
+	* Version 7.6.0
+	* Log errors in linters with ERROR logging level
+	* Include pylint support into pylama by default.
+
+2018-10-02 k.klenov
+	* Version 7.5.5
+	* Take advantage of startswith accepting a tuple #119
+
+2018-10-02 k.klenov
+	* Version 7.5.4
+	* Fix build with ASCII locale #116
+	* Respect tools own config without pylama #117
+
+2018-10-02 k.klenov
+	* Version 7.5.3
+	* Fix Travis CI 
+	
+2018-10-02 k.klenov
+	* Version 7.5.2
+	* Fix Travis CI 
+	
+2018-10-02 k.klenov
+	* Version 7.5.1
+	* Fix tests & update authors
+	
+2018-10-02 k.klenov
+	* Version 7.5.0
+	* 
+
+2017-09-13 k.klenov
+	* Version 7.4.2
+	* Fix Git hook with Python 3.6 #111
+
+2017-09-13 k.klenov
+	* Version 7.4.2
+
+
 2017-09-04  horneds
 	* Version 7.4.1
 	* Fix Windows encoding problem #108

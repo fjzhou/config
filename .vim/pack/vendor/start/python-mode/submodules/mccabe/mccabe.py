@@ -16,7 +16,7 @@ try:
 except ImportError:   # Python 2.5
     from flake8.util import ast, iter_child_nodes
 
-__version__ = '0.6.1'
+__version__ = '0.7.0'
 
 
 class ASTVisitor(object):
@@ -84,7 +84,7 @@ class PathGraph(object):
 
     def complexity(self):
         """ Return the McCabe complexity for the graph.
-            V-E+2
+            E-V+2
         """
         num_edges = sum([len(n) for n in self.nodes.values()])
         num_nodes = len(self.nodes)
@@ -323,6 +323,9 @@ def main(argv=None):
                     default=1)
 
     options, args = opar.parse_args(argv)
+    if not args:
+        opar.print_help()
+        opar.exit()
 
     code = _read(args[0])
     tree = compile(code, args[0], "exec", ast.PyCF_ONLY_AST)

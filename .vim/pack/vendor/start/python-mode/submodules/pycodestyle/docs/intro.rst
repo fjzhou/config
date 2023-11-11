@@ -71,11 +71,9 @@ Example usage and output
   optparse.py:69:11: E401 multiple imports on one line
   optparse.py:77:1: E302 expected 2 blank lines, found 1
   optparse.py:88:5: E301 expected 1 blank line, found 0
-  optparse.py:222:34: W602 deprecated form of raising exception
   optparse.py:347:31: E211 whitespace before '('
   optparse.py:357:17: E201 whitespace after '{'
   optparse.py:472:29: E221 multiple spaces before operator
-  optparse.py:544:21: W601 .has_key() is deprecated, use 'in'
 
 You can also make ``pycodestyle.py`` show the source code for each error, and
 even the relevant text from PEP 8::
@@ -103,8 +101,6 @@ Or you can display how often each error was found::
   165     E303 too many blank lines (4)
   325     E401 multiple imports on one line
   3615    E501 line too long (82 characters)
-  612     W601 .has_key() is deprecated, use 'in'
-  1188    W602 deprecated form of raising exception
 
 You can also make ``pycodestyle.py`` show the error text in different formats by
 using ``--format`` having options default/pylint/custom::
@@ -159,6 +155,7 @@ Quick help is available on the command line::
     --max-line-length=n  set maximum allowed line length (default: 79)
     --max-doc-length=n   set maximum allowed doc line length and perform these
                          checks (unchecked if not set)
+    --indent-size=n      set how many spaces make up an indent (default: 4)
     --hang-closing       hang closing bracket instead of matching indentation of
                          opening bracket's line
     --format=format      set the error format [default|pylint|<custom>]
@@ -199,7 +196,7 @@ Example::
 
   [pycodestyle]
   count = False
-  ignore = E226,E302,E41
+  ignore = E226,E302,E71
   max-line-length = 160
   statistics = True
 
@@ -263,7 +260,7 @@ This is the current list of error and warning codes:
 +------------+----------------------------------------------------------------------+
 | E202       | whitespace before ')'                                                |
 +------------+----------------------------------------------------------------------+
-| E203       | whitespace before ':'                                                |
+| E203       | whitespace before ',', ';', or ':'                                   |
 +------------+----------------------------------------------------------------------+
 +------------+----------------------------------------------------------------------+
 | E211       | whitespace before '('                                                |
@@ -405,22 +402,14 @@ This is the current list of error and warning codes:
 +------------+----------------------------------------------------------------------+
 | **W5**     | *Line break warning*                                                 |
 +------------+----------------------------------------------------------------------+
-| W503 (*)   | line break before binary operator                                    |
+| W503 (*)   | line break before binary operator                                    |
 +------------+----------------------------------------------------------------------+
-| W504 (*)   | line break after binary operator                                     |
+| W504 (*)   | line break after binary operator                                     |
 +------------+----------------------------------------------------------------------+
 | W505 (\*^) | doc line too long (82 > 79 characters)                               |
 +------------+----------------------------------------------------------------------+
 +------------+----------------------------------------------------------------------+
 | **W6**     | *Deprecation warning*                                                |
-+------------+----------------------------------------------------------------------+
-| W601       | .has_key() is deprecated, use 'in'                                   |
-+------------+----------------------------------------------------------------------+
-| W602       | deprecated form of raising exception                                 |
-+------------+----------------------------------------------------------------------+
-| W603       | '<>' is deprecated, use '!='                                         |
-+------------+----------------------------------------------------------------------+
-| W604       | backticks are deprecated, use 'repr()'                               |
 +------------+----------------------------------------------------------------------+
 | W605       | invalid escape sequence '\x'                                         |
 +------------+----------------------------------------------------------------------+
@@ -431,7 +420,7 @@ This is the current list of error and warning codes:
 **(*)** In the default configuration, the checks **E121**, **E123**, **E126**, **E133**,
 **E226**, **E241**, **E242**, **E704**, **W503**, **W504** and **W505** are ignored
 because they are not rules unanimously accepted, and `PEP 8`_ does not enforce them.
-Please note that if the option **--ignore=errors** is used,
+Please note that if the option ``--ignore=errors`` is used,
 the default configuration will be overridden and ignore only the check(s) you skip.
 The check **W503** is mutually exclusive with check **W504**.
 The check **E133** is mutually exclusive with check **E123**.  Use switch

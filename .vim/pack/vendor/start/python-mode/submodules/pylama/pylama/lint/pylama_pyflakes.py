@@ -2,50 +2,55 @@
 
 from pyflakes import checker
 
-from pylama.lint import Linter as Abstract
+from pylama.context import RunContext
+from pylama.lint import LinterV2 as Abstract
 
+m = checker.messages
+CODES = {
+    m.UnusedImport.message: "W0611",
+    m.RedefinedWhileUnused.message: "W0404",
+    m.ImportShadowedByLoopVar.message: "W0621",
+    m.ImportStarUsed.message: "W0401",
+    m.ImportStarUsage.message: "W0401",
+    m.UndefinedName.message: "E0602",
+    m.DoctestSyntaxError.message: "W0511",
+    m.UndefinedExport.message: "E0603",
+    m.UndefinedLocal.message: "E0602",
+    m.DuplicateArgument.message: "E1122",
+    m.LateFutureImport.message: "W0410",
+    m.UnusedVariable.message: "W0612",
+    m.ReturnOutsideFunction.message: "E0104",
+}
 
-checker.messages.UnusedImport.message = "W0611 %r imported but unused"
-checker.messages.RedefinedWhileUnused.message = "W0404 redefinition of unused %r from line %r"
-checker.messages.RedefinedInListComp.message = "W0621 list comprehension redefines %r from line %r"
-checker.messages.ImportShadowedByLoopVar.message = "W0621 import %r from line %r shadowed by loop variable"
-checker.messages.ImportStarUsed.message = "W0401 'from %s import *' used; unable to detect undefined names"
-checker.messages.ImportStarUsage.message = "W0401 '%s may be undefined, or defined from star imports: %s'"
-checker.messages.UndefinedName.message = "E0602 undefined name %r"
-checker.messages.DoctestSyntaxError.message = "W0511 syntax error in doctest"
-checker.messages.UndefinedExport.message = "E0603 undefined name %r in __all__"
-checker.messages.UndefinedLocal.message = "E0602 local variable %r (defined in enclosing scope on line %r) referenced before assignment"
-checker.messages.DuplicateArgument.message = "E1122 duplicate argument %r in function definition"
-checker.messages.LateFutureImport.message = "W0410 future import(s) %r after other statements"
-checker.messages.UnusedVariable.message = "W0612 local variable %r is assigned to but never used"
-checker.messages.ReturnWithArgsInsideGenerator.message = "E0106 'return' with argument inside generator"
-checker.messages.ReturnOutsideFunction.message = "E0104 'return' outside function"
-
+# RedefinedInListComp and ReturnWithArgsInsideGenerator were removed at pyflakes 2.5.0:
+#   https://github.com/PyCQA/pyflakes/commit/2246217295dc8cb30ef4a7b9d8dc449ce32e603a
+if hasattr(m, "RedefinedInListComp"):
+    CODES[m.RedefinedInListComp.message] = "W0621"
+if hasattr(m, "ReturnWithArgsInsideGenerator"):
+    CODES[m.ReturnWithArgsInsideGenerator.message] = "E0106"
 
 
 class Linter(Abstract):
     """Pyflakes runner."""
 
-    @staticmethod
-    def run(path, code=None, params=None, **meta):
-        """Check code with pyflakes.
+    name = "pyflakes"
 
-        :return list: List of errors.
-        """
-        import _ast
-
+    def run_check(self, context: RunContext):  # noqa
+        """Check code with pyflakes."""
+        params = context.get_params("pyflakes")
         builtins = params.get("builtins", "")
-
         if builtins:
             builtins = builtins.split(",")
 
-        tree = compile(code, path, "exec", _ast.PyCF_ONLY_AST)
-        w = checker.Checker(tree, path, builtins=builtins)
-        w.messages = sorted(w.messages, key=lambda m: m.lineno)
-        return [{
-            'lnum': m.lineno,
-            'text': m.message % m.message_args,
-            'type': m.message[0]
-        } for m in w.messages]
+        check = checker.Checker(context.ast, context.filename, builtins=builtins)
+        for msg in check.messages:
+            context.push(
+                lnum=msg.lineno,
+                col=msg.col + 1,
+                text=msg.message % msg.message_args,
+                number=CODES.get(msg.message, ""),
+                source="pyflakes",
+            )
+
 
 #  pylama:ignore=E501,C0301

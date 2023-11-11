@@ -1,66 +1,71 @@
-# Copyright (c) 2013-2014, 2016-2020 Claudiu Popa <pcmanticore@gmail.com>
-# Copyright (c) 2013-2014 Google, Inc.
-# Copyright (c) 2013-2014 LOGILAB S.A. (Paris, FRANCE) <contact@logilab.fr>
-# Copyright (c) 2014 Arun Persaud <arun@nubati.net>
-# Copyright (c) 2015 Ionel Cristian Maries <contact@ionelmc.ro>
-# Copyright (c) 2016 Derek Gustafson <degustaf@gmail.com>
-# Copyright (c) 2016 glegoux <gilles.legoux@gmail.com>
-# Copyright (c) 2018 Rogalski, Lukasz <lukasz.rogalski@intel.com>
-# Copyright (c) 2018 Anthony Sottile <asottile@umich.edu>
-# Copyright (c) 2019-2020 Pierre Sassoulas <pierre.sassoulas@gmail.com>
-# Copyright (c) 2019 Ashley Whetter <ashley@awhetter.co.uk>
-
 # Licensed under the GPL: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-# For details: https://github.com/PyCQA/pylint/blob/master/COPYING
+# For details: https://github.com/PyCQA/pylint/blob/main/LICENSE
+# Copyright (c) https://github.com/PyCQA/pylint/blob/main/CONTRIBUTORS.txt
 
 """Tests for the misc checker."""
 
 from pylint.checkers import misc
-from pylint.testutils import CheckerTestCase, Message, _tokenize_str, set_config
+from pylint.testutils import CheckerTestCase, MessageTest, _tokenize_str, set_config
 
 
 class TestFixme(CheckerTestCase):
     CHECKER_CLASS = misc.EncodingChecker
 
-    def test_fixme_with_message(self):
+    def test_fixme_with_message(self) -> None:
         code = """a = 1
                 # FIXME message
                 """
         with self.assertAddsMessages(
-            Message(msg_id="fixme", line=2, args="FIXME message")
+            MessageTest(msg_id="fixme", line=2, args="FIXME message", col_offset=17)
         ):
             self.checker.process_tokens(_tokenize_str(code))
 
-    def test_todo_without_message(self):
+    def test_todo_without_message(self) -> None:
         code = """a = 1
                 # TODO
                 """
-        with self.assertAddsMessages(Message(msg_id="fixme", line=2, args="TODO")):
+        with self.assertAddsMessages(
+            MessageTest(msg_id="fixme", line=2, args="TODO", col_offset=17)
+        ):
             self.checker.process_tokens(_tokenize_str(code))
 
-    def test_xxx_without_space(self):
+    def test_xxx_without_space(self) -> None:
         code = """a = 1
                 #XXX
                 """
-        with self.assertAddsMessages(Message(msg_id="fixme", line=2, args="XXX")):
+        with self.assertAddsMessages(
+            MessageTest(msg_id="fixme", line=2, args="XXX", col_offset=17)
+        ):
             self.checker.process_tokens(_tokenize_str(code))
 
-    def test_xxx_middle(self):
+    def test_xxx_middle(self) -> None:
         code = """a = 1
                 # midle XXX
                 """
         with self.assertNoMessages():
             self.checker.process_tokens(_tokenize_str(code))
 
-    def test_without_space_fixme(self):
+    def test_without_space_fixme(self) -> None:
         code = """a = 1
                 #FIXME
                 """
-        with self.assertAddsMessages(Message(msg_id="fixme", line=2, args="FIXME")):
+        with self.assertAddsMessages(
+            MessageTest(msg_id="fixme", line=2, args="FIXME", col_offset=17)
+        ):
+            self.checker.process_tokens(_tokenize_str(code))
+
+    @set_config(notes=["???"])
+    def test_non_alphanumeric_codetag(self) -> None:
+        code = """a = 1
+                #???
+                """
+        with self.assertAddsMessages(
+            MessageTest(msg_id="fixme", line=2, args="???", col_offset=17)
+        ):
             self.checker.process_tokens(_tokenize_str(code))
 
     @set_config(notes=[])
-    def test_absent_codetag(self):
+    def test_absent_codetag(self) -> None:
         code = """a = 1
                 # FIXME	                # FIXME
                 # TODO	                # TODO
@@ -70,27 +75,34 @@ class TestFixme(CheckerTestCase):
             self.checker.process_tokens(_tokenize_str(code))
 
     @set_config(notes=["CODETAG"])
-    def test_other_present_codetag(self):
+    def test_other_present_codetag(self) -> None:
         code = """a = 1
                 # CODETAG
                 # FIXME
                 """
-        with self.assertAddsMessages(Message(msg_id="fixme", line=2, args="CODETAG")):
+        with self.assertAddsMessages(
+            MessageTest(msg_id="fixme", line=2, args="CODETAG", col_offset=17)
+        ):
             self.checker.process_tokens(_tokenize_str(code))
 
-    def test_issue_2321_should_not_trigger(self):
+    def test_issue_2321_should_not_trigger(self) -> None:
         code = 'print("# TODO this should not trigger a fixme")'
         with self.assertNoMessages():
             self.checker.process_tokens(_tokenize_str(code))
 
-    def test_issue_2321_should_trigger(self):
+    def test_issue_2321_should_trigger(self) -> None:
         code = "# TODO this should not trigger a fixme"
         with self.assertAddsMessages(
-            Message(msg_id="fixme", line=1, args="TODO this should not trigger a fixme")
+            MessageTest(
+                msg_id="fixme",
+                line=1,
+                args="TODO this should not trigger a fixme",
+                col_offset=1,
+            )
         ):
             self.checker.process_tokens(_tokenize_str(code))
 
-    def test_dont_trigger_on_todoist(self):
+    def test_dont_trigger_on_todoist(self) -> None:
         code = """
         # Todoist API: What is this task about?
         # Todoist API: Look up a task's due date

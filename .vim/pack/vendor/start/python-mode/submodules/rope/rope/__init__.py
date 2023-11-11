@@ -1,9 +1,28 @@
 """rope, a python refactoring library"""
 
+from pkg_resources import DistributionNotFound, get_distribution
+
+try:
+    VERSION = get_distribution("rope").version
+except DistributionNotFound:
+
+    def get_fallback_version():
+        import pathlib
+        import re
+
+        pyproject = (
+            pathlib.Path(__file__).resolve().parent.parent / "pyproject.toml"
+        ).read_text()
+        version = re.search("version.*=.*'(.*)'", pyproject)
+        return version.group(1) if version else None
+
+    VERSION = get_fallback_version()
+
+
 INFO = __doc__
-VERSION = '0.18.0'
 COPYRIGHT = """\
-Copyright (C) 2019-2020 Matej Cepl
+Copyright (C) 2021-2022 Lie Ryan
+Copyright (C) 2019-2021 Matej Cepl
 Copyright (C) 2015-2018 Nicholas Smith
 Copyright (C) 2014-2015 Matej Cepl
 Copyright (C) 2006-2012 Ali Gholami Rudi

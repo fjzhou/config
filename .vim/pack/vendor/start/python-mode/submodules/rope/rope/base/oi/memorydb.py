@@ -1,8 +1,9 @@
+from rope.base import utils
 from rope.base.oi import objectdb
+from rope.base.serializer import json_to_python, python_to_json
 
 
 class MemoryDB(objectdb.FileDict):
-
     def __init__(self, project, persist=None):
         self.project = project
         self._persist = persist
@@ -13,8 +14,7 @@ class MemoryDB(objectdb.FileDict):
     def _load_files(self):
         self._files = {}
         if self.persist:
-            result = self.project.data_files.read_data(
-                'objectdb', compress=self.compress, import_=True)
+            result = self.project.data_files.read_data("objectdb")
             if result is not None:
                 self._files = result
 
@@ -22,8 +22,7 @@ class MemoryDB(objectdb.FileDict):
         return self._files.keys()
 
     def __iter__(self):
-        for f in self._files:
-            yield f
+        yield from self._files
 
     def __len__(self):
         return len(self._files)
@@ -51,23 +50,22 @@ class MemoryDB(objectdb.FileDict):
 
     def write(self):
         if self.persist:
-            self.project.data_files.write_data('objectdb', self._files,
-                                               self.compress)
+            self.project.data_files.write_data("objectdb", self._files)
 
     @property
+    @utils.deprecated("compress_objectdb is no longer supported")
     def compress(self):
-        return self.project.prefs.get('compress_objectdb', False)
+        return False
 
     @property
     def persist(self):
         if self._persist is not None:
             return self._persist
         else:
-            return self.project.prefs.get('save_objectdb', False)
+            return self.project.prefs.get("save_objectdb", False)
 
 
 class FileInfo(objectdb.FileInfo):
-
     def __init__(self, scopes):
         self.scopes = scopes
 
@@ -87,8 +85,7 @@ class FileInfo(objectdb.FileInfo):
         del self.scopes[key]
 
     def __iter__(self):
-        for s in self.scopes:
-            yield s
+        yield from self.scopes
 
     def __len__(self):
         return len(self.scopes)
@@ -97,9 +94,7 @@ class FileInfo(objectdb.FileInfo):
         raise NotImplementedError()
 
 
-
 class ScopeInfo(objectdb.ScopeInfo):
-
     def __init__(self):
         self.call_info = {}
         self.per_name = {}
@@ -121,7 +116,16 @@ class ScopeInfo(objectdb.ScopeInfo):
         self.call_info[parameters] = returned
 
     def __getstate__(self):
-        return (self.call_info, self.per_name)
+        original_data = (self.call_info, self.per_name)
+        encoded = python_to_json(original_data, version=2)
+        encoded["$"] = "ScopeInfo"
+        return encoded
 
     def __setstate__(self, data):
-        self.call_info, self.per_name = data
+        if isinstance(data, tuple) and len(data) == 2:
+            # legacy pickle-based serialization
+            self.call_info, self.per_name = data
+        else:
+            # new serialization
+            assert data["$"] == "ScopeInfo"
+            self.call_info, self.per_name = json_to_python(data)

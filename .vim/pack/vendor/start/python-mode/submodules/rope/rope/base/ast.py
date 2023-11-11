@@ -1,25 +1,36 @@
-from __future__ import absolute_import
 import ast
-from ast import *
+import sys
+from ast import *  # noqa: F401,F403
 
 from rope.base import fscommands
 
 try:
-    unicode
-except NameError:
-    unicode = str
+    # Suppress the mypy complaint: Module "ast" has no attribute "_const_node_type_names"
+    from ast import _const_node_type_names  # type:ignore
+except ImportError:
+    # backported from stdlib `ast`
+    assert sys.version_info < (3, 8)
+    _const_node_type_names = {
+        bool: "NameConstant",  # should be before int
+        type(None): "NameConstant",
+        int: "Num",
+        float: "Num",
+        complex: "Num",
+        str: "Str",
+        bytes: "Bytes",
+        type(...): "Ellipsis",
+    }
 
 
-def parse(source, filename='<string>'):
-    # NOTE: the raw string should be given to `compile` function
-    if isinstance(source, unicode):
+def parse(source, filename="<string>", *args, **kwargs):  # type: ignore
+    if isinstance(source, str):
         source = fscommands.unicode_to_file_data(source)
-    if b'\r' in source:
-        source = source.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
-    if not source.endswith(b'\n'):
-        source += b'\n'
+    if b"\r" in source:
+        source = source.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    if not source.endswith(b"\n"):
+        source += b"\n"
     try:
-        return ast.parse(source, filename='<unknown>')
+        return ast.parse(source, filename=filename, *args, **kwargs)
     except (TypeError, ValueError) as e:
         error = SyntaxError()
         error.lineno = 1
@@ -28,50 +39,45 @@ def parse(source, filename='<string>'):
         raise error
 
 
-def walk(node, walker):
-    """Walk the syntax tree"""
-    method_name = '_' + node.__class__.__name__
-    method = getattr(walker, method_name, None)
-    if method is not None:
-        if isinstance(node, ast.ImportFrom) and node.module is None:
-            # In python < 2.7 ``node.module == ''`` for relative imports
-            # but for python 2.7 it is None. Generalizing it to ''.
-            node.module = ''
-        return method(node)
-    for child in get_child_nodes(node):
-        walk(child, walker)
+def call_for_nodes(node, callback):
+    """
+    Pre-order depth-first traversal of AST nodes, calling `callback(node)` for
+    each node visited.
 
+    When each node is visited, `callback(node)` will be called with the visited
+    `node`, then its children node will be visited.
 
-def get_child_nodes(node):
-    if isinstance(node, ast.Module):
-        return node.body
-    result = []
-    if node._fields is not None:
-        for name in node._fields:
-            child = getattr(node, name)
-            if isinstance(child, list):
-                for entry in child:
-                    if isinstance(entry, ast.AST):
-                        result.append(entry)
-            if isinstance(child, ast.AST):
-                result.append(child)
-    return result
+    If `callback(node)` returns `True` for a node, then the descendants of that
+    node will not be visited.
 
-
-def call_for_nodes(node, callback, recursive=False):
-    """If callback returns `True` the child nodes are skipped"""
+    See _ResultChecker._find_node for an example.
+    """
     result = callback(node)
-    if recursive and not result:
-        for child in get_child_nodes(node):
-            call_for_nodes(child, callback, recursive)
+    if not result:
+        for child in ast.iter_child_nodes(node):
+            call_for_nodes(child, callback)
 
 
-def get_children(node):
-    result = []
-    if node._fields is not None:
-        for name in node._fields:
-            if name in ['lineno', 'col_offset']:
-                continue
-            child = getattr(node, name)
-            result.append(child)
-    return result
+class RopeNodeVisitor(ast.NodeVisitor):
+    def visit(self, node):
+        """Modified from ast.NodeVisitor to match rope's existing Visitor implementation"""
+        method = "_" + node.__class__.__name__
+        visitor = getattr(self, method, self.generic_visit)
+        return visitor(node)
+
+
+def get_const_subtype_name(node):
+    """Get pre-3.8 ast node name"""
+    # fmt: off
+    assert sys.version_info >= (3, 8), "This should only be called in Python 3.8 and above"
+    # fmt: on
+    assert isinstance(node, ast.Constant)
+    return _const_node_type_names[type(node.value)]
+
+
+def get_node_type_name(node):
+    return (
+        get_const_subtype_name(node)
+        if isinstance(node, ast.Constant)
+        else node.__class__.__name__
+    )

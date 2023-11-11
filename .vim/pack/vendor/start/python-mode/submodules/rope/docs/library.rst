@@ -3,7 +3,7 @@
 =========================
 
 If you need other features, send a feature request.  Have a look at
-`contributing.rst`_.
+:ref:`contributing:Contributing to Rope`.
 
 
 .. contents:: Table of Contents
@@ -72,7 +72,7 @@ In rope, files and folders in a project are accessed through
 ``Change``\s (we'll talk about them later) use resources.
 
 There are two options for creating a ``Resource`` for a path in a project.
-The first approach uses the `Project.get_resource()`_ method.
+The first approach uses the ``Project.get_resource()`` method.
 
 .. code-block:: python
 
@@ -217,7 +217,7 @@ the project. It is recommended that you call this function occasionally,
 and especially before performing large refactorings. Note that analyzing
 all modules of a project may take a long time.
 
-If you have ``automatic_soa`` set, which instructs rop to analyze the
+If you have ``automatic_soa`` set, which instructs rope to analyze the
 changed scopes of modules, then you should report the changes by calling
 ``rope.base.libutils.report_change()`` when saving files, as follows:
 
@@ -282,7 +282,7 @@ that it might take a long time to finish.
 
 Returns a ``rope.base.pyobjects.PyModule`` object for the code string.
 An optional ``resource`` argument can be specified for the resource this
-code is associated with. If ``force_errors` is ``True``, then
+code is associated with. If ``force_errors`` is ``True``, then
 ``rope.base.exceptions.ModuleSyntaxError`` is raised when the code has
 syntax errors. Otherwise, syntax errors are silently ignored. Note that
 ``force_errors`` overrides the ``ignore_syntax_errors`` project
@@ -501,7 +501,7 @@ might want to do something like:
           percent = jobset.get_percent_done()
           if percent is not None:
               text += ' ... %s percent done' % percent
-          print text
+          print(text)
 
   handle.add_observer(update_progress)
 
@@ -631,7 +631,7 @@ Using rename refactoring:
   >>> from rope.contrib import generate
   >>> pkg = generate.create_package(project, 'pkg')
   >>> mod2 = generate.create_module(project, 'mod2', pkg)
-  >>> mod2.write('import mod1\nprint mod1.a_var\n')
+  >>> mod2.write('import mod1\nprint(mod1.a_var)\n')
 
   # We can use `Project.find_module` for finding modules, too
   >>> assert mod2 == project.find_module('pkg.mod2')
@@ -643,7 +643,7 @@ Using rename refactoring:
   >>> mod1.read()
   u'new_var = 10\n'
   >>> mod2.read()
-  u'import mod1\nprint mod1.new_var\n'
+  u'import mod1\nprint(mod1.new_var)\n'
 
   # Undoing rename refactoring
   >>> project.history.undo()
@@ -651,7 +651,7 @@ Using rename refactoring:
   >>> mod1.read()
   u'a_var = 10\n'
   >>> mod2.read()
-  u'import mod1\nprint mod1.a_var\n'
+  u'import mod1\nprint(mod1.a_var)\n'
 
   # Cleaning up
   >>> pkg.remove()
@@ -663,7 +663,7 @@ Restructuring
 -------------
 
 The example for replacing occurrences of our ``pow`` function to ``**``
-operator (see the restructuring section of `overview.rst`_):
+operator (see ref:`overview:Restructurings`):
 
 .. code-block:: python
 
@@ -698,9 +698,6 @@ operator (see the restructuring section of `overview.rst`_):
 
 See code documentation and test suites for more information.
 
-.. _overview.rst: overview.rst
-.. _contributing.rst: contributing.rst
-
 
 Other Topics
 ============
@@ -714,7 +711,7 @@ The ``get_changes()`` method of refactoring classes return a
 calling ``Project.do()``.  But as explained above some IDEs need to
 perform the changes themselves.
 
-Every change to the file-system in rope is commited using an object that
+Every change to the file-system in rope is committed using an object that
 provides a ``rope.base.fscommands.FileSystemCommands`` interface.  As
 explained above in `rope.base.fscommands`_ section, rope uses this
 interface to handle different VCSs.
@@ -743,6 +740,10 @@ You can implement your own fscommands object:
 
     def write(self, path, data):
         """Write `data` to file at `path`"""
+        # ...
+
+    def read(self, path):
+        """Read `data` from file at `path`"""
         # ...
 
 And you can create a project like this:
@@ -832,6 +833,43 @@ returns the list of modules with the given global name.
 global name that starts with the given prefix.
 
 
+There are currently two implementations of autoimport in rope, a deprecated
+implementation that uses pickle-based storage
+(rope.contrib.autoimport.pickle.AutoImport) and a new, experimental one that
+uses sqlite3 database (rope.contrib.autoimport.sqlite.AutoImport). New and
+existing integrations should migrate to the sqlite3 storage as the pickle-based
+autoimport will be removed in the future.
+
+
+`rope.contrib.autoimport.sqlite`
+--------------------------------
+
+By default, the sqlite3-based only stores autoimport cache in an in-memory
+sqlite3 database, you can make it write the import cache to persistent storage
+by passing memory=False to AutoImport constructor.
+
+It must be closed when done with the ``AutoImport.close()`` method.
+
+AutoImport can search for a name from both modules and statements you can import from them.
+
+.. code-block:: python
+
+  from rope.base.project import Project
+  from rope.contrib.autoimport import AutoImport
+
+  project = Project("/path/to/project")
+  autoimport = AutoImport(project, memory=False)
+  autoimport.generate_resource_cache()  # Generates a cache of the local modules, from the project you're working on
+  autoimport.generate_modules_cache()  # Generates a cache of external modules
+  print(autoimport.search("Dict"))
+  autoimport.close()
+  project.close()
+
+It provides two new search methods:
+ -  search_full() - returns a list of mostly unsorted tuples. This has itemkind and source information.
+ -  search() - simpler wrapper around search_full with a basic sorting algorithm
+
+
 Cross-Project Refactorings
 --------------------------
 
@@ -859,7 +897,7 @@ an example consider that we want to perform a rename refactoring:
                                                      projects)
 
 
-Here ``projects`` is the list of dependant projects.  It does not
+Here ``projects`` is the list of dependent projects.  It does not
 include the main project.  The first argument is the refactoring class
 (such as ``Rename``) or factory function (like ``create_move``).
 

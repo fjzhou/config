@@ -1,89 +1,94 @@
 """Pylint integration to Pylama."""
 import logging
-from os import path as op, environ
+from argparse import ArgumentParser
+from os import environ
+from pathlib import Path
+from typing import Dict
 
-from astroid import MANAGER
-from pylama.lint import Linter as BaseLinter
-from pylint.__pkginfo__ import numversion
+from pylint.interfaces import CONFIDENCE_LEVELS
 from pylint.lint import Run
 from pylint.reporters import BaseReporter
 
+from pylama.context import RunContext
+from pylama.lint import LinterV2 as BaseLinter
 
-CURDIR = op.abspath(op.dirname(__file__))
-HOME_RCFILE = op.abspath(op.join(environ.get('HOME', ''), '.pylintrc'))
-LAMA_RCFILE = op.abspath(op.join(CURDIR, 'pylint.rc'))
+HOME_RCFILE = Path(environ.get("HOME", "")) / ".pylintrc"
 
 
-logger = logging.getLogger('pylama')
+logger = logging.getLogger("pylama")
 
 
 class Linter(BaseLinter):
     """Check code with Pylint."""
 
-    @staticmethod
-    def run(path, code, params=None, ignore=None, select=None, **meta):
-        """Pylint code checking.
+    name = "pylint"
 
-        :return list: List of errors.
-        """
-        logger.debug('Start pylint')
+    @classmethod
+    def add_args(cls, parser: ArgumentParser):
+        """Add --max-complexity option."""
+        parser.add_argument(
+            "--pylint-confidence",
+            choices=[cc.name for cc in CONFIDENCE_LEVELS],
+            help="Only show warnings with the listed confidence levels.",
+        )
 
-        clear_cache = params.pop('clear_cache', False)
-        if clear_cache:
-            MANAGER.astroid_cache.clear()
+    def run_check(self, ctx: RunContext):
+        """Pylint code checking."""
+        logger.debug("Start pylint")
+        params = ctx.get_params("pylint")
+        options = ctx.options
+        if options:
+            params.setdefault("max_line_length", options.max_line_length)
+            params.setdefault("confidence", options.pylint_confidence)
+
+        params.setdefault("enable", ctx.select | ctx.get_filter("pylint", "select"))
+        params.setdefault("disable", ctx.ignore | ctx.get_filter("pylint", "ignore"))
+        # if params.get("disable"):
+        #     params["disable"].add("W0012")
 
         class Reporter(BaseReporter):
+            """Handle messages."""
 
-            def __init__(self):
-                self.errors = []
-                super(Reporter, self).__init__()
-
-            def _display(self, layout):
+            def _display(self, _):
                 pass
 
             def handle_message(self, msg):
-                self.errors.append(dict(
+                msg_id = msg.msg_id
+                ctx.push(
+                    filtrate=False,
+                    col=msg.column + 1,
                     lnum=msg.line,
-                    col=msg.column,
-                    text="%s %s" % (msg.msg_id, msg.msg),
-                    type=msg.msg_id[0]
-                ))
+                    number=msg_id,
+                    text=msg.msg,
+                    type=msg_id[0],
+                    source="pylint",
+                )
 
-        params = _Params(ignore=ignore, select=select, params=params)
         logger.debug(params)
 
         reporter = Reporter()
-
-        kwargs = {
-            (numversion[0] == 1 and 'exit' or 'do_exit'): False
-        }
-
-        Run([path] + params.to_attrs(), reporter=reporter, **kwargs)
-
-        return reporter.errors
+        args = _Params(params).to_attrs()
+        Run([ctx.temp_filename] + args, reporter=reporter, exit=False)
 
 
-class _Params(object):
+class _Params:
     """Store pylint params."""
 
-    def __init__(self, select=None, ignore=None, params=None):
+    def __init__(self, params: Dict):
+        attrs = {
+            name.replace("_", "-"): self.prepare_value(value)
+            for name, value in params.items()
+            if value
+        }
+        if HOME_RCFILE.exists():
+            attrs["rcfile"] = HOME_RCFILE.as_posix()
 
-        params = dict(params)
+        if attrs.get("disable"):
+            attrs["disable"] += ",W0012"
+        else:
+            attrs["disable"] = "W0012"
 
-        if op.exists(HOME_RCFILE):
-            params['rcfile'] = HOME_RCFILE
-
-        if select:
-            enable = params.get('enable', None)
-            params['enable'] = select | set(enable.split(",") if enable else [])
-
-        if ignore:
-            disable = params.get('disable', None)
-            params['disable'] = ignore | set(disable.split(",") if disable else [])
-
-        self.params = dict(
-            (name.replace('_', '-'), self.prepare_value(value))
-            for name, value in params.items() if value is not None)
+        self.attrs = attrs
 
     @staticmethod
     def prepare_value(value):
@@ -98,12 +103,13 @@ class _Params(object):
 
     def to_attrs(self):
         """Convert to argument list."""
-        return ["--%s=%s" % item for item in self.params.items()]
+        return [f"--{key}={value}" for key, value in self.attrs.items()]  # noqa
 
     def __str__(self):
         return " ".join(self.to_attrs())
 
     def __repr__(self):
-        return "<Pylint %s>" % self
+        return f"<Pylint {self}>"
+
 
 # pylama:ignore=W0403
