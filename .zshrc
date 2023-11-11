@@ -122,3 +122,17 @@ test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_in
 export TZ='Asia/Shanghai'
 export GPG_TTY=$(tty)
 cd
+
+proxy() {
+    export http_proxy="http://127.0.0.1:1080"
+    export https_proxy="https://127.0.0.1:1080"
+    export all_proxy="socks://127.0.0.1:1080"
+    echo "HTTP Proxy on"
+}
+
+noproxy() {
+    unset http_proxy
+    unset https_proxy
+    unset all_proxy
+    echo "HTTP Proxy off"
+}
