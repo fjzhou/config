@@ -261,3 +261,10 @@ inoreabbrev <expr> <bar><bar>
 inoreabbrev <expr> __
             \ <SID>isAtStartOfLine('__') ?
             \ '<c-o>:silent! TableModeDisable<cr>' : '__'
+
+" Comment blocks of code
+autocmd FileType c,cpp,java,scala let b:comment_header = '//'
+autocmd FileType sh,ruby,python,conf,fstab let b:comment_header = '#'
+autocmd FileType vim let b:comment_header = '"'
+noremap <silent> <leader>cc :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_header,'\/')<CR>/<CR>:nohlsearch<CR>
+noremap <silent> <leader>cu :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_header,'\/')<CR>//e<CR>:nohlsearch<CR>
